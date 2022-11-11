@@ -155,7 +155,7 @@ class UserProfilePage extends Article {
 		$out->addHTML( $this->getUserStats() );
 		//$out->addHTML( $this->getGifts() );
 		//$out->addHTML( $this->getAwards() );
-		$out->addHTML( $this->getCustomInfo() );
+		//$out->addHTML( $this->getCustomInfo() );
 		$out->addHTML( $this->getInterests() );
 		//$out->addHTML( $this->getFanBoxes() );
 
@@ -187,7 +187,7 @@ class UserProfilePage extends Article {
 				'method' => __METHOD__
 			] );
 		}
-		$out->addHTML( $this->getCasualGames() );
+		//$out->addHTML( $this->getCasualGames() );
 		$out->addHTML( $this->getUserBoard( $context->getUser() ) );
 
 		if ( !Hooks::run( 'UserProfileEndRight', [ &$userProfilePage ] ) ) {
@@ -299,48 +299,8 @@ class UserProfilePage extends Article {
 	 *
 	 * @return array
 	 */
-	function getUserPolls() {
-		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
-
-		$polls = [];
-		$logger = LoggerFactory::getInstance( 'SocialProfile' );
-
-		// Try cache
-		// @note Keep this cache key in sync with PollNY
-		// (includes/PollNY.hooks.php and includes/specials/SpecialCreatePoll.php)
-		$key = $cache->makeKey( 'user', 'profile', 'polls', 'actor_id', $this->profileOwner->getActorId() );
-		$data = $cache->get( $key );
-
-		if ( $data ) {
-			$logger->debug( "Got profile polls for user name {user_name} from cache\n", [
-				'user_name' => $this->profileOwner->getName()
-			] );
-
-			$polls = $data;
-		} else {
-			$logger->debug( "Got profile polls for user name {user_name} from DB\n", [
-				'user_name' => $this->profileOwner->getName()
-			] );
-
-			$dbr = wfGetDB( DB_REPLICA );
-			$res = $dbr->select(
-				[ 'poll_question', 'page' ],
-				[ 'page_title', 'poll_date' ],
-				/* WHERE */[ 'poll_actor' => $this->profileOwner->getActorId() ],
-				__METHOD__,
-				[ 'ORDER BY' => 'poll_id DESC', 'LIMIT' => 3 ],
-				[ 'page' => [ 'INNER JOIN', 'page_id = poll_page_id' ] ]
-			);
-			foreach ( $res as $row ) {
-				$polls[] = [
-					'title' => $row->page_title,
-					'timestamp' => wfTimestamp( TS_UNIX, $row->poll_date )
-				];
-			}
-			$cache->set( $key, $polls );
-		}
-		return $polls;
-	}
+	/*function getUserPolls() {
+	}*/
 
 	/**
 	 * Get three of the quiz games the user has created and cache the data in
@@ -348,7 +308,7 @@ class UserProfilePage extends Article {
 	 *
 	 * @return array
 	 */
-	function getUserQuiz() {
+	/*function getUserQuiz() {
 		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
 
 		$quiz = [];
@@ -394,7 +354,7 @@ class UserProfilePage extends Article {
 		}
 
 		return $quiz;
-	}
+	}*/
 
 	/**
 	 * Get three of the picture games the user has created and cache the data
@@ -402,7 +362,7 @@ class UserProfilePage extends Article {
 	 *
 	 * @return array
 	 */
-	function getUserPicGames() {
+	/*function getUserPicGames() {
 		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
 
 		$pics = [];
@@ -449,7 +409,7 @@ class UserProfilePage extends Article {
 		}
 
 		return $pics;
-	}
+	}*/
 
 	/**
 	 * Get the casual games (polls, quizzes and picture games) that the user
@@ -458,7 +418,7 @@ class UserProfilePage extends Article {
 	 *
 	 * @return string HTML or nothing if this feature isn't enabled
 	 */
-	function getCasualGames() {
+	/*function getCasualGames() {
 		global $wgUserProfileDisplay;
 
 		if ( $wgUserProfileDisplay['games'] == false ) {
@@ -599,7 +559,7 @@ class UserProfilePage extends Article {
 		}
 
 		return $output;
-	}
+	}*/
 
 	static function sortItems( $x, $y ) {
 		if ( $x['timestamp'] == $y['timestamp'] ) {
@@ -687,7 +647,7 @@ class UserProfilePage extends Article {
 		}
 
 		// Hometown
-		$hometown = $profile_data['hometown_city'] . ', ' . $profile_data['hometown_state'];
+		/*$hometown = $profile_data['hometown_city'] . ', ' . $profile_data['hometown_state'];
 		if ( $profile_data['hometown_country'] != $defaultCountry ) {
 			if ( $profile_data['hometown_city'] && $profile_data['hometown_state'] ) { // city AND state
 				$hometown = $profile_data['hometown_city'] . ', ' .
@@ -723,42 +683,39 @@ class UserProfilePage extends Article {
 
 		if ( $hometown == ', ' ) {
 			$hometown = '';
-		}
+		}*/
 
-		$joined_data = $profile_data['real_name'] . $location . $hometown .
-						$profile_data['birthday'] . $profile_data['occupation'] .
-						$profile_data['websites'] . $profile_data['places_lived'] .
-						$profile_data['schools'] . $profile_data['about'];
+		$joined_data = $profile_data['websites'] . $profile_data['about'];
 		$edit_info_link = SpecialPage::getTitleFor( 'UpdateProfile' );
 
 		// Privacy fields holy shit!
 		$personal_output = '';
-		if ( in_array( 'up_real_name', $this->profile_visible_fields ) ) {
+		/*if ( in_array( 'up_real_name', $this->profile_visible_fields ) ) {
 			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-real-name' )->escaped(), $profile_data['real_name'], false );
-		}
+		}*/
 
 		$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-location' )->escaped(), $location, false );
-		$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-hometown' )->escaped(), $hometown, false );
+		//$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-hometown' )->escaped(), $hometown, false );
 
-		if ( in_array( 'up_birthday', $this->profile_visible_fields ) ) {
+		/*if ( in_array( 'up_birthday', $this->profile_visible_fields ) ) {
 			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-birthday' )->escaped(), $profile_data['birthday'], false );
-		}
+		}*/
 
-		if ( in_array( 'up_occupation', $this->profile_visible_fields ) ) {
+		/*if ( in_array( 'up_occupation', $this->profile_visible_fields ) ) {
 			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-occupation' )->escaped(), $profile_data['occupation'], false );
-		}
+		}*/
 
 		if ( in_array( 'up_websites', $this->profile_visible_fields ) ) {
 			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-websites' )->escaped(), $profile_data['websites'], false );
 		}
 
-		if ( in_array( 'up_places_lived', $this->profile_visible_fields ) ) {
+		/*if ( in_array( 'up_places_lived', $this->profile_visible_fields ) ) {
 			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-places-lived' )->escaped(), $profile_data['places_lived'], false );
-		}
+		}*/
 
-		if ( in_array( 'up_schools', $this->profile_visible_fields ) ) {
+		/*if ( in_array( 'up_schools', $this->profile_visible_fields ) ) {
 			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-schools' )->escaped(), $profile_data['schools'], false );
-		}
+		}*/
 
 		if ( in_array( 'up_about', $this->profile_visible_fields ) ) {
 			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-about-me' )->escaped(), $profile_data['about'], false );
@@ -812,7 +769,7 @@ class UserProfilePage extends Article {
 	 *
 	 * @return string HTML
 	 */
-	function getCustomInfo() {
+	/*function getCustomInfo() {
 		global $wgUserProfileDisplay;
 
 		if ( $wgUserProfileDisplay['custom'] == false ) {
@@ -882,7 +839,7 @@ class UserProfilePage extends Article {
 		}
 
 		return $output;
-	}
+	}*/
 
 	/**
 	 * Get the interests (favorite movies, TV shows, music, etc.) for a given
