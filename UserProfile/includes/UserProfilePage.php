@@ -152,12 +152,12 @@ class UserProfilePage extends Article {
 
 		$out->addHTML( $this->getRelationships( 1 ) );
 		$out->addHTML( $this->getRelationships( 2 ) );
-		$out->addHTML( $this->getGifts() );
-		$out->addHTML( $this->getAwards() );
+		$out->addHTML( $this->getUserStats() );
+		//$out->addHTML( $this->getGifts() );
+		//$out->addHTML( $this->getAwards() );
 		$out->addHTML( $this->getCustomInfo() );
 		$out->addHTML( $this->getInterests() );
-		$out->addHTML( $this->getFanBoxes() );
-		$out->addHTML( $this->getUserStats() );
+		//$out->addHTML( $this->getFanBoxes() );
 
 		if ( !Hooks::run( 'UserProfileEndLeft', [ &$userProfilePage ] ) ) {
 			$logger->debug( "{method}: UserProfileEndLeft messed up profile!\n", [
@@ -1602,7 +1602,7 @@ class UserProfilePage extends Article {
 		return $output;
 	}
 
-	function getAwards() {
+	/*function getAwards() {
 		global $wgUserProfileDisplay;
 
 		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
@@ -1700,7 +1700,7 @@ class UserProfilePage extends Article {
 		}
 
 		return $output;
-	}
+	}*/
 
 	/**
 	 * Get the user board for a given user.

@@ -37,11 +37,11 @@ $wgExtensionMessagesFiles['AvatarMagic'] = __DIR__ . '/UserProfile/includes/avat
 if ( defined( 'MEDIAWIKI_INSTALL' ) ) {
 	$subext = [
 		__DIR__ . '/SystemGifts/extension.json' => 1,
+		//__DIR__ . '/UserGifts/extension.json' => 1,
 		__DIR__ . '/UserActivity/extension.json' => 1,
 		__DIR__ . '/UserBoard/extension.json' => 1,
 		__DIR__ . '/UserRelationship/extension.json' => 1,
 		__DIR__ . '/UserStats/extension.json' => 1,
-		__DIR__ . '/UserGifts/extension.json' => 1,
 	];
 
 	$registry = new ExtensionRegistry();
@@ -122,8 +122,8 @@ $wgAutoloadClasses['SocialProfileHooks'] = __DIR__ . '/SocialProfileHooks.php';
 // Loader files
 require_once __DIR__ . '/UserProfile/UserProfile.php'; // Profile page configuration loader file
 wfLoadExtensions( [
-	'SocialProfile/SystemGifts', // SystemGifts (awards functionality)
-	'SocialProfile/UserGifts',
+	//'SocialProfile/UserGifts',
+	'SocialProfile/SystemGifts', // SystemGifts (awards functionality, friend system)
 	'SocialProfile/UserActivity', // UserActivity - recent social changes
 	'SocialProfile/UserBoard',
 	'SocialProfile/UserRelationship',

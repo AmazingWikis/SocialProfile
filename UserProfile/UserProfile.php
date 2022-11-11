@@ -49,16 +49,17 @@ $wgUserProfileThresholds = [
 $wgUserPageChoice = true;
 
 $wgUserProfileDisplay['friends'] = true;
-$wgUserProfileDisplay['foes'] = false;
-$wgUserProfileDisplay['gifts'] = true;
-$wgUserProfileDisplay['awards'] = true;
-$wgUserProfileDisplay['profile'] = true;
 $wgUserProfileDisplay['board'] = true;
-$wgUserProfileDisplay['stats'] = true; // Display statistics on user profile pages?
-$wgUserProfileDisplay['interests'] = true;
-$wgUserProfileDisplay['custom'] = true;
-$wgUserProfileDisplay['personal'] = true;
 $wgUserProfileDisplay['activity'] = true; // Display recent social activity?
+$wgUserProfileDisplay['stats'] = true; // Display statistics on user profile pages?
+$wgUserProfileDisplay['profile'] = true;
+$wgUserProfileDisplay['interests'] = true;
+$wgUserProfileDisplay['personal'] = true;
+
+$wgUserProfileDisplay['foes'] = false;
+$wgUserProfileDisplay['gifts'] = false;
+$wgUserProfileDisplay['awards'] = false;
+$wgUserProfileDisplay['custom'] = false;
 $wgUserProfileDisplay['userboxes'] = false; // If FanBoxes extension is installed, setting this to true will display the user's fanboxes on their profile page
 $wgUserProfileDisplay['games'] = false; // Display casual games created by the user on their profile? This requires three separate social extensions: PictureGame, PollNY and QuizGame
 
@@ -69,10 +70,6 @@ $wgAvailableRights[] = 'avatarremove';
 $wgAvailableRights[] = 'editothersprofiles';
 $wgAvailableRights[] = 'editothersprofiles-private';
 $wgAvailableRights[] = 'populate-user-profiles';
-$wgGroupPermissions['sysop']['avatarremove'] = true;
-$wgGroupPermissions['staff']['editothersprofiles'] = true;
-$wgGroupPermissions['staff']['editothersprofiles-private'] = true;
-$wgGroupPermissions['staff']['populate-user-profiles'] = true;
 
 // ResourceLoader support for MediaWiki 1.17+
 $wgResourceModules['ext.socialprofile.userprofile.css'] = [

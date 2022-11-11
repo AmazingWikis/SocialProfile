@@ -50,39 +50,21 @@ class SocialProfileHooks {
 		$updater->addExtensionTable( 'user_fields_privacy', "$dir/UserProfile/sql/user_fields_privacy$dbExt.sql" );
 		$updater->addExtensionTable( 'user_profile', "$dir/UserProfile/sql/user_profile$dbExt.sql" );
 		$updater->addExtensionTable( 'user_stats', "$dir/UserStats/sql/user_stats$dbExt.sql" );
+		$updater->addExtensionTable( 'user_system_messages', "$dir/UserStats/sql/user_system_messages$dbExt.sql" );
 		$updater->addExtensionTable( 'user_relationship', "$dir/UserRelationship/sql/user_relationship$dbExt.sql" );
 		$updater->addExtensionTable( 'user_relationship_request', "$dir/UserRelationship/sql/user_relationship_request$dbExt.sql" );
 		$updater->addExtensionTable( 'user_system_gift', "$dir/SystemGifts/sql/user_system_gift$dbExt.sql" );
 		$updater->addExtensionTable( 'system_gift', "$dir/SystemGifts/sql/system_gift$dbExt.sql" );
-		$updater->addExtensionTable( 'user_gift', "$dir/UserGifts/sql/user_gift$dbExt.sql" );
-		$updater->addExtensionTable( 'gift', "$dir/UserGifts/sql/gift$dbExt.sql" );
-		$updater->addExtensionTable( 'user_system_messages', "$dir/UserStats/sql/user_system_messages$dbExt.sql" );
-		$updater->addExtensionTable( 'user_points_weekly', "$dir/UserStats/sql/user_points_weekly$dbExt.sql" );
-		$updater->addExtensionTable( 'user_points_monthly', "$dir/UserStats/sql/user_points_monthly$dbExt.sql" );
-		$updater->addExtensionTable( 'user_points_archive', "$dir/UserStats/sql/user_points_archive$dbExt.sql" );
+		//$updater->addExtensionTable( 'user_gift', "$dir/UserGifts/sql/user_gift$dbExt.sql" );
+		//$updater->addExtensionTable( 'gift', "$dir/UserGifts/sql/gift$dbExt.sql" );
+		//$updater->addExtensionTable( 'user_points_weekly', "$dir/UserStats/sql/user_points_weekly$dbExt.sql" );
+		//$updater->addExtensionTable( 'user_points_monthly', "$dir/UserStats/sql/user_points_monthly$dbExt.sql" );
+		//$updater->addExtensionTable( 'user_points_archive', "$dir/UserStats/sql/user_points_archive$dbExt.sql" );
 
 		$updater->dropExtensionField( 'user_stats', 'stats_year_id', "$dir/UserStats/sql/patches/patch-drop-column-stats_year_id.sql" );
 		$updater->dropExtensionField( 'user_profile', 'up_last_seen', "$dir/UserProfile/sql/patches/patch-drop-column-up_last_seen.sql" );
 
 		// Actor support
-
-		# SystemGifts
-		if ( !$db->fieldExists( 'user_system_gift', 'sg_actor', __METHOD__ ) ) {
-			// 1) add new actor column
-			$updater->addExtensionField( 'user_system_gift', 'sg_actor', "$dir/SystemGifts/sql/patches/actor/add-sg_actor$dbExt.sql" );
-			// 2) add the corresponding index
-			$updater->addExtensionIndex( 'user_system_gift', 'sg_actor', "$dir/SystemGifts/sql/patches/actor/add-sg_actor_index.sql" );
-			// 3) populate the new column with data
-			$updater->addExtensionUpdate( [
-				'runMaintenance',
-				'MigrateOldSystemGiftsUserColumnsToActor',
-				"$dir/SystemGifts/maintenance/migrateOldSystemGiftsUserColumnsToActor.php"
-			] );
-			// 4) drop old columns & indexes
-			$updater->dropExtensionField( 'user_system_gift', 'sg_user_name', "$dir/SystemGifts/sql/patches/actor/drop-sg_user_name.sql" );
-			$updater->dropExtensionField( 'user_system_gift', 'sg_user_id', "$dir/SystemGifts/sql/patches/actor/drop-sg_user_id.sql" );
-			$updater->dropExtensionIndex( 'user_system_gift', 'sg_user_id', "$dir/SystemGifts/sql/patches/actor/drop-sg_user_id_index.sql" );
-		}
 
 		# UserBoard
 		if ( !$db->fieldExists( 'user_board', 'ub_actor', __METHOD__ ) ) {
@@ -107,8 +89,26 @@ class SocialProfileHooks {
 			$updater->dropExtensionIndex( 'user_board', 'ub_user_id', "$dir/UserBoard/sql/patches/actor/drop-ub_user_id_from_index.sql" );
 		}
 
+		# SystemGifts
+		/*if ( !$db->fieldExists( 'user_system_gift', 'sg_actor', __METHOD__ ) ) {
+			// 1) add new actor column
+			$updater->addExtensionField( 'user_system_gift', 'sg_actor', "$dir/SystemGifts/sql/patches/actor/add-sg_actor$dbExt.sql" );
+			// 2) add the corresponding index
+			$updater->addExtensionIndex( 'user_system_gift', 'sg_actor', "$dir/SystemGifts/sql/patches/actor/add-sg_actor_index.sql" );
+			// 3) populate the new column with data
+			$updater->addExtensionUpdate( [
+				'runMaintenance',
+				'MigrateOldSystemGiftsUserColumnsToActor',
+				"$dir/SystemGifts/maintenance/migrateOldSystemGiftsUserColumnsToActor.php"
+			] );
+			// 4) drop old columns & indexes
+			$updater->dropExtensionField( 'user_system_gift', 'sg_user_name', "$dir/SystemGifts/sql/patches/actor/drop-sg_user_name.sql" );
+			$updater->dropExtensionField( 'user_system_gift', 'sg_user_id', "$dir/SystemGifts/sql/patches/actor/drop-sg_user_id.sql" );
+			$updater->dropExtensionIndex( 'user_system_gift', 'sg_user_id', "$dir/SystemGifts/sql/patches/actor/drop-sg_user_id_index.sql" );
+		}*/
+
 		# UserGifts -- both tables, gift and user_gift, are affected
-		if ( !$db->fieldExists( 'gift', 'gift_creator_actor', __METHOD__ ) ) {
+		/*if ( !$db->fieldExists( 'gift', 'gift_creator_actor', __METHOD__ ) ) {
 			// 1) add new actor column
 			$updater->addExtensionField( 'gift', 'gift_creator_actor', "$dir/UserGifts/sql/patches/actor/add-gift_creator_actor$dbExt.sql" );
 			// 2) populate the new column with data
@@ -120,9 +120,9 @@ class SocialProfileHooks {
 			// 3) drop old columns
 			$updater->dropExtensionField( 'gift', 'gift_creator_user_id', "$dir/UserGifts/sql/patches/actor/drop-gift_creator_user_id.sql" );
 			$updater->dropExtensionField( 'gift', 'gift_creator_user_name', "$dir/UserGifts/sql/patches/actor/drop-gift_creator_user_name.sql" );
-		}
+		}*/
 
-		if ( !$db->fieldExists( 'user_gift', 'ug_actor_to', __METHOD__ ) ) {
+		/*if ( !$db->fieldExists( 'user_gift', 'ug_actor_to', __METHOD__ ) ) {
 			// 1) add new actor column
 			$updater->addExtensionField( 'user_gift', 'ug_actor_to', "$dir/UserGifts/sql/patches/actor/add-ug_actor_to$dbExt.sql" );
 			$updater->addExtensionField( 'user_gift', 'ug_actor_from', "$dir/UserGifts/sql/patches/actor/add-ug_actor_from$dbExt.sql" );
@@ -142,7 +142,7 @@ class SocialProfileHooks {
 			$updater->dropExtensionField( 'user_gift', 'ug_user_name_from', "$dir/UserGifts/sql/patches/actor/drop-ug_user_name_from.sql" );
 			$updater->dropExtensionIndex( 'user_gift', 'ug_user_id_from', "$dir/UserGifts/sql/patches/actor/drop-ug_user_id_from_index.sql" );
 			$updater->dropExtensionIndex( 'user_gift', 'ug_user_id_to', "$dir/UserGifts/sql/patches/actor/drop-ug_user_id_to_index.sql" );
-		}
+		}*/
 
 		# UserProfile -- two affected tables, user_profile and user_fields_privacy
 		if ( !$db->fieldExists( 'user_profile', 'up_actor', __METHOD__ ) ) {
@@ -258,7 +258,7 @@ class SocialProfileHooks {
 			$updater->dropExtensionIndex( 'user_system_messages', 'up_user_id', "$dir/UserStats/sql/patches/actor/drop-index-up_user_id-on-user_system_messages.sql" );
 		}
 
-		if ( !$db->fieldExists( 'user_points_archive', 'up_actor', __METHOD__ ) ) {
+		/*if ( !$db->fieldExists( 'user_points_archive', 'up_actor', __METHOD__ ) ) {
 			// 1) add new actor column
 			$updater->addExtensionField( 'user_points_archive', 'up_actor', "$dir/UserStats/sql/patches/actor/add-up_actor-on-user_points_archive$dbExt.sql" );
 			// 2) add the corresponding index
@@ -273,9 +273,9 @@ class SocialProfileHooks {
 			$updater->dropExtensionField( 'user_points_archive', 'up_user_name', "$dir/UserStats/sql/patches/actor/drop-up_user_name-on-user_points_archive.sql" );
 			$updater->dropExtensionField( 'user_points_archive', 'up_user_id', "$dir/UserStats/sql/patches/actor/drop-up_user_id-on-user_points_archive.sql" );
 			$updater->dropExtensionIndex( 'user_points_archive', 'upa_up_user_id', "$dir/UserStats/sql/patches/actor/drop-index-upa_up_user_id-on-user_points_archive.sql" );
-		}
+		}*/
 
-		if ( !$db->fieldExists( 'user_points_monthly', 'up_actor', __METHOD__ ) ) {
+		/*if ( !$db->fieldExists( 'user_points_monthly', 'up_actor', __METHOD__ ) ) {
 			// 1) add new actor column
 			$updater->addExtensionField( 'user_points_monthly', 'up_actor', "$dir/UserStats/sql/patches/actor/add-up_actor-on-user_points_monthly$dbExt.sql" );
 			// 2) add the corresponding index
@@ -290,9 +290,9 @@ class SocialProfileHooks {
 			$updater->dropExtensionField( 'user_points_monthly', 'up_user_name', "$dir/UserStats/sql/patches/actor/drop-up_user_name-on-user_points_monthly.sql" );
 			$updater->dropExtensionField( 'user_points_monthly', 'up_user_id', "$dir/UserStats/sql/patches/actor/drop-up_user_id-on-user_points_monthly.sql" );
 			$updater->dropExtensionIndex( 'user_points_monthly', 'upm_up_user_id', "$dir/UserStats/sql/patches/actor/drop-index-upm_up_user_id-on-user_points_monthly.sql" );
-		}
+		}*/
 
-		if ( !$db->fieldExists( 'user_points_weekly', 'up_actor', __METHOD__ ) ) {
+		/*if ( !$db->fieldExists( 'user_points_weekly', 'up_actor', __METHOD__ ) ) {
 			// 1) add new actor column
 			$updater->addExtensionField( 'user_points_weekly', 'up_actor', "$dir/UserStats/sql/patches/actor/add-up_actor-on-user_points_weekly$dbExt.sql" );
 			// 2) add the corresponding index
@@ -307,7 +307,7 @@ class SocialProfileHooks {
 			$updater->dropExtensionField( 'user_points_weekly', 'up_user_name', "$dir/UserStats/sql/patches/actor/drop-up_user_name-on-user_points_weekly.sql" );
 			$updater->dropExtensionField( 'user_points_weekly', 'up_user_id', "$dir/UserStats/sql/patches/actor/drop-up_user_id-on-user_points_weekly.sql" );
 			$updater->dropExtensionIndex( 'user_points_weekly', 'upw_up_user_id', "$dir/UserStats/sql/patches/actor/drop-index-upw_up_user_id-on-user_points_weekly.sql" );
-		}
+		}*/
 	}
 
 }
