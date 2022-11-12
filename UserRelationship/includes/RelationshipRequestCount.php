@@ -21,7 +21,6 @@ class RelationshipRequestCount {
 	/**
 	 * @var int
 	 * - 1 for friends
-	 * - 2 (or anything else but 1) for foes
 	 */
 	private $type;
 
@@ -51,17 +50,6 @@ class RelationshipRequestCount {
 	 */
 	public function setFriends() {
 		$this->type = 1;
-
-		return $this;
-	}
-
-	/**
-	 * Sets the type as foes
-	 *
-	 * @return RelationshipRequestCount
-	 */
-	public function setFoes() {
-		$this->type = 2;
 
 		return $this;
 	}

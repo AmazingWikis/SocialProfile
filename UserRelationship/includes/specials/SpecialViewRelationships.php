@@ -132,7 +132,6 @@ class SpecialViewRelationships extends SpecialPage {
 		$stats = new UserStats( $targetUser );
 		$stats_data = $stats->getUserStats();
 		$friend_count = $stats_data['friend_count'];
-		$foe_count = $stats_data['foe_count'];
 
 		if ( $rel_type == 1 ) {
 			$out->setPageTitle( $this->msg( 'ur-title-friend', $targetUser->getName() )->parse() );
@@ -151,25 +150,7 @@ class SpecialViewRelationships extends SpecialPage {
 				$targetUser->getName(),
 				$total
 			)->escaped() . '</div>';
-		} else {
-			$out->setPageTitle( $this->msg( 'ur-title-foe', $targetUser->getName() )->parse() );
-
-			$total = $foe_count;
-
-			$rem = $this->msg( 'ur-remove-relationship-foe' )->plain();
-
-			$output .= '<div class="back-links">
-			<a href="' . htmlspecialchars( $targetUser->getUserPage()->getFullURL() ) . '">' .
-				$this->msg( 'ur-backlink', $targetUser->getName() )->parse() .
-			'</a>
-		</div>
-		<div class="relationship-count">'
-			. $this->msg(
-				'ur-relationship-count-foes',
-				$targetUser->getName(),
-				$total
-			)->escaped() . '</div>';
-		}
+		} 
 
 		if ( $relationships ) {
 			$x = 1;
@@ -185,7 +166,6 @@ class SpecialViewRelationships extends SpecialPage {
 				// Safe titles
 				$addRelationshipLink = SpecialPage::getTitleFor( 'AddRelationship' );
 				$removeRelationshipLink = SpecialPage::getTitleFor( 'RemoveRelationship' );
-				$giveGiftLink = SpecialPage::getTitleFor( 'GiveGift' );
 
 				$userPageURL = htmlspecialchars( $actor->getUserPage()->getFullURL() );
 				$avatar = new wAvatar( $actor->getId(), 'ml' );
@@ -201,7 +181,8 @@ class SpecialViewRelationships extends SpecialPage {
 				if ( ( $username_space == false || $username_space >= "30" ) && $username_length > 30 ) {
 					$user_name_display = substr( $actor->getName(), 0, 30 ) .
 						' ' . substr( $actor->getName(), 30, 50 );
-				} else {
+				}
+				else {
 					$user_name_display = $actor->getName();
 				}
 				$user_name_display = htmlspecialchars( $user_name_display );
@@ -214,7 +195,7 @@ class SpecialViewRelationships extends SpecialPage {
 						</div>
 					<div class=\"relationship-actions\">";
 
-				// Provide links to add/remove as foe/friend and give a gift, except for ourselves
+				// Provide links to add/remove as friend except for ourselves
 				if ( $relationship['actor'] != $user->getActorId() ) {
 					if ( $indivRelationship == false ) {
 						// No relationship with us, links to add relationship
@@ -224,12 +205,6 @@ class SpecialViewRelationships extends SpecialPage {
 								$this->msg( 'ur-add-friend' )->text(),
 								[],
 								[ 'user' => $actor->getName(), 'rel_type' => 1 ]
-							),
-							$linkRenderer->makeLink(
-								$addRelationshipLink,
-								$this->msg( 'ur-add-foe' )->text(),
-								[],
-								[ 'user' => $actor->getName(), 'rel_type' => 2 ]
 							),
 							''
 						] );
@@ -243,14 +218,8 @@ class SpecialViewRelationships extends SpecialPage {
 						);
 						$output .= $this->msg( 'pipe-separator' )->escaped();
 					}
-
-					$output .= $linkRenderer->makeLink(
-						$giveGiftLink,
-						$this->msg( 'ur-give-gift' )->text(),
-						[],
-						[ 'user' => $actor->getName() ]
-					);
-				} else {
+				} 
+				else {
 					// Add an empty space to account for the lack of links
 					$output .= '&nbsp;';
 				}

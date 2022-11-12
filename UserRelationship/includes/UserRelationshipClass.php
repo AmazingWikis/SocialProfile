@@ -32,7 +32,6 @@ class UserRelationship {
 	 * @param User $userTo Recipient of the relationship request
 	 * @param int $type
 	 * - 1 for friend request
-	 * - 2 (or anything else than 1) for foe request
 	 * @param string|null $message User-supplied message
 	 * to the recipient; may be empty
 	 * @param bool $email Send out email to the recipient of the request?
@@ -121,21 +120,7 @@ class UserRelationship {
 						$updateProfileLink->getFullURL()
 					)->text()
 				];
-			} else {
-				$subject = wfMessage( 'foe_request_subject', $userFrom )->text();
-				$body = [
-					'html' => wfMessage( 'foe_request_body_html',
-						$name,
-						$userFrom
-					)->parse(),
-					'text' => wfMessage( 'foe_request_body',
-						$name,
-						$userFrom,
-						$requestLink->getFullURL(),
-						$updateProfileLink->getFullURL()
-					)->text()
-				];
-			}
+			} 
 
 			$userTo->sendMail( $subject, $body );
 		}
@@ -148,7 +133,6 @@ class UserRelationship {
 	 * @param User $user The recipient of the e-mail
 	 * @param int $type
 	 * - 1 for friend
-	 * - 2 (or anything else but 1) for foe
 	 */
 	public function sendRelationshipAcceptEmail( $user, $type ) {
 		$user->load();
@@ -183,23 +167,7 @@ class UserRelationship {
 						$updateProfileLink->getFullURL()
 					)->text()
 				];
-			} else {
-				$subject = wfMessage( 'foe_accept_subject', $userFrom )->text();
-				$body = [
-					'html' => wfMessage(
-						'foe_accept_body_html',
-						$name,
-						$userFrom->getName()
-					)->parse(),
-					'text' => wfMessage(
-						'foe_accept_body',
-						$name,
-						$userFrom->getName(),
-						$userFrom->getUserPage()->getFullURL(),
-						$updateProfileLink->getFullURL()
-					)->text()
-				];
-			}
+			} 
 
 			$user->sendMail( $subject, $body );
 		}
@@ -211,7 +179,6 @@ class UserRelationship {
 	 * @param User $user The recipient of the e-mail
 	 * @param int $type
 	 * - 1 for friend
-	 * - 2 (or anything else but 1) for foe
 	 */
 	public function sendRelationshipRemoveEmail( $user, $type ) {
 		$user->load();
@@ -243,23 +210,7 @@ class UserRelationship {
 						$updateProfileLink->getFullURL()
 					)->text()
 				];
-			} else {
-				$subject = wfMessage( 'foe_removed_subject', $userFrom->getName() )->text();
-				$body = [
-					'html' => wfMessage(
-						'foe_removed_body_html',
-						$name,
-						$userFrom->getName()
-					)->parse(),
-					'text' => wfMessage(
-						'foe_removed_body',
-						$name,
-						$userFrom->getName(),
-						$userFrom->getUserPage()->getFullURL(),
-						$updateProfileLink->getFullURL()
-					)->text()
-				];
-			}
+			} 
 
 			$user->sendMail( $subject, $body );
 		}
@@ -364,8 +315,8 @@ class UserRelationship {
 	/**
 	 * Remove a relationship between two users and clear caches afterwards.
 	 *
-	 * @param User $user1 User who is removing a friend/foe
-	 * @param User $user2 The friend/foe being removed
+	 * @param User $user1 User who is removing a friend
+	 * @param User $user2 The friend being removed
 	 */
 	public function removeRelationship( $user1, $user2 ) {
 		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
@@ -551,7 +502,6 @@ class UserRelationship {
 	 *
 	 * @param int $type
 	 * - 1 for friends
-	 * - 2 (or anything else but 1) for foes
 	 * @return array Array of actor ID numbers
 	 */
 	public function getRelationshipIDs( $type ) {

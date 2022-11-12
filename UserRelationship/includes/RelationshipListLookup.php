@@ -128,14 +128,4 @@ class RelationshipListLookup {
 	public function getFriendList( $page = 0 ) {
 		return $this->getRelationshipList( 1, $page );
 	}
-
-	/**
-	 * Gets the list of foes for the current user
-	 *
-	 * @param int $page See getRelationshipList()
-	 * @return array See getRelationshipList()
-	 */
-	public function getFoeList( $page = 0 ) {
-		return $this->getRelationshipList( 2, $page );
-	}
 }

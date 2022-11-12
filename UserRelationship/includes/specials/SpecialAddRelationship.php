@@ -3,7 +3,6 @@
  * A special page for adding friends/foe requests for existing users in the wiki
  *
  * Example URL: index.php?title=Special:AddRelationship&user=Pean&rel_type=1 (for adding as friend)
- * Example URL: index.php?title=Special:AddRelationship&user=Pean&rel_type=2 (for adding as foe)
  *
  * @file
  * @ingroup Extensions
@@ -15,12 +14,12 @@
 class SpecialAddRelationship extends UnlistedSpecialPage {
 
 	/**
-	 * @var User The user (object) who we are friending/foeing
+	 * @var User The user (object) who we are friending
 	 */
 	public $user_to;
 
 	/**
-	 * @var int 1 for friending, any other number for foeing
+	 * @var int 1 for friending
 	 */
 	public $relationship_type;
 
@@ -40,7 +39,7 @@ class SpecialAddRelationship extends UnlistedSpecialPage {
 	/**
 	 * Show the special page
 	 *
-	 * @param string|null $par Name of the user whom to remove as a friend/foe and
+	 * @param string|null $par Name of the user whom to remove as a friend and
 	 *   relationship type name (e.g. Alice/friend to add Alice as a friend)
 	 */
 	public function execute( $par ) {
@@ -129,10 +128,7 @@ class SpecialAddRelationship extends UnlistedSpecialPage {
 		} elseif ( $hasRelationship >= 1 ) {
 			if ( $hasRelationship == 1 ) {
 				$error = $this->msg( 'ur-add-error-message-existing-relationship-friend', $this->user_to->getName() )->parseAsBlock();
-			} else {
-				$error = $this->msg( 'ur-add-error-message-existing-relationship-foe', $this->user_to->getName() )->parseAsBlock();
-			}
-
+			} 
 			$avatar = new wAvatar( $this->user_to->getId(), 'l' );
 
 			$out->setPageTitle( $this->msg( 'ur-error-title' )->plain() );
@@ -151,10 +147,7 @@ class SpecialAddRelationship extends UnlistedSpecialPage {
 		} elseif ( UserRelationship::userHasRequestByID( $this->user_to, $currentUser ) == true ) {
 			if ( $this->relationship_type == 1 ) {
 				$error = $this->msg( 'ur-add-error-message-pending-friend-request', $this->user_to->getName() )->parseAsBlock();
-			} else {
-				$error = $this->msg( 'ur-add-error-message-pending-foe-request', $this->user_to->getName() )->parseAsBlock();
-			}
-
+			} 
 			$avatar = new wAvatar( $this->user_to->getId(), 'l' );
 
 			$out->setPageTitle( $this->msg( 'ur-add-error-message-pending-request-title' )->plain() );
@@ -178,10 +171,7 @@ class SpecialAddRelationship extends UnlistedSpecialPage {
 
 			if ( $this->relationship_type == 1 ) {
 				$error = $this->msg( 'ur-add-error-message-not-loggedin-friend' )->escaped();
-			} else {
-				$error = $this->msg( 'ur-add-error-message-not-loggedin-foe' )->escaped();
 			}
-
 			$out->setPageTitle( $this->msg( 'ur-error-title' )->plain() );
 
 			$output = '<div class="relationship-error-message">'
@@ -213,11 +203,7 @@ class SpecialAddRelationship extends UnlistedSpecialPage {
 				if ( $this->relationship_type == 1 ) {
 					$out->setPageTitle( $this->msg( 'ur-add-sent-title-friend', $this->user_to->getName() )->parse() );
 					$sent = $this->msg( 'ur-add-sent-message-friend', $this->user_to->getName() )->parseAsBlock();
-				} else {
-					$out->setPageTitle( $this->msg( 'ur-add-sent-title-foe', $this->user_to->getName() )->parse() );
-					$sent = $this->msg( 'ur-add-sent-message-foe', $this->user_to->getName() )->parseAsBlock();
-				}
-
+				} 
 				$output = "<div class=\"relationship-action\">
 					{$avatar->getAvatarURL()}
 					" . $sent . "
@@ -255,7 +241,7 @@ class SpecialAddRelationship extends UnlistedSpecialPage {
 	}
 
 	/**
-	 * Displays the form for adding a friend or a foe
+	 * Displays the form for adding a friend
 	 *
 	 * @return string HTML
 	 */
@@ -266,12 +252,7 @@ class SpecialAddRelationship extends UnlistedSpecialPage {
 			$out->setPageTitle( $this->msg( 'ur-add-title-friend', $this->user_to->getName() )->parse() );
 			$add = $this->msg( 'ur-add-message-friend', $this->user_to->getName() )->parseAsBlock();
 			$button = $this->msg( 'ur-add-button-friend' )->escaped();
-		} else {
-			$out->setPageTitle( $this->msg( 'ur-add-title-foe', $this->user_to->getName() )->parse() );
-			$add = $this->msg( 'ur-add-message-foe', $this->user_to->getName() )->parseAsBlock();
-			$button = $this->msg( 'ur-add-button-foe' )->escaped();
-		}
-
+		} 
 		$avatar = new wAvatar( $this->user_to->getId(), 'l' );
 
 		$form = "<form action=\"\" method=\"post\" enctype=\"multipart/form-data\" name=\"form1\">

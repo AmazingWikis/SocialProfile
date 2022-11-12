@@ -14,12 +14,12 @@
 class SpecialRemoveRelationship extends UnlistedSpecialPage {
 
 	/**
-	 * @var User User (object) who we are unfriending/unfoeing
+	 * @var User User (object) who we are unfriending
 	 */
 	public $user_to;
 
 	/**
-	 * @var int 1 for friending, any other number for foeing
+	 * @var int 1 for friending
 	 */
 	public $relationship_type;
 
@@ -71,12 +71,7 @@ class SpecialRemoveRelationship extends UnlistedSpecialPage {
 			$confirmMsg = $this->msg( 'ur-remove-relationship-message-confirm-friend', $this->user_to->getName() )->parseAsBlock();
 			$error = htmlspecialchars( $this->msg( 'ur-remove-error-not-loggedin-friend' )->plain() );
 			$pending = $this->msg( 'ur-remove-error-message-pending-friend-request', $this->user_to->getName() )->parse();
-		} else {
-			$confirmTitle = $this->msg( 'ur-remove-relationship-title-confirm-foe', $this->user_to->getName() )->parse();
-			$confirmMsg = $this->msg( 'ur-remove-relationship-message-confirm-foe', $this->user_to->getName() )->parseAsBlock();
-			$error = htmlspecialchars( $this->msg( 'ur-remove-error-not-loggedin-foe' )->plain() );
-			$pending = $this->msg( 'ur-remove-error-message-pending-foe-request', $this->user_to->getName() )->parse();
-		}
+		} 
 
 		$output = '';
 		if ( $user->getActorId() == $this->user_to->getActorId() ) {
@@ -171,7 +166,7 @@ class SpecialRemoveRelationship extends UnlistedSpecialPage {
 	}
 
 	/**
-	 * Displays the form for removing a friend or a foe
+	 * Displays the form for removing a friend
 	 *
 	 * @return string HTML code for the form
 	 */
@@ -188,17 +183,7 @@ class SpecialRemoveRelationship extends UnlistedSpecialPage {
 				$this->user_to->getName(),
 				$this->msg( 'ur-remove' )->plain()
 			)->parseAsBlock();
-		} else {
-			$title = $this->msg(
-				'ur-remove-relationship-title-foe',
-				$this->user_to->getName()
-			)->parse();
-			$remove = $this->msg(
-				'ur-remove-relationship-message-foe',
-				$this->user_to->getName(),
-				$this->msg( 'ur-remove' )->plain()
-			)->parseAsBlock();
-		}
+		} 
 
 		$this->getOutput()->setPageTitle( $title );
 
