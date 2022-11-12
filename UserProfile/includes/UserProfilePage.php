@@ -154,6 +154,10 @@ class UserProfilePage extends Article {
 		$out->addHTML( $this->getRelationships( 2 ) );
 		$out->addHTML( $this->getUserStats() );
 		$out->addHTML( $this->getInterests() );
+		//$out->addHTML( $this->getGifts() );
+		//$out->addHTML( $this->getAwards() );
+		//$out->addHTML( $this->getCustomInfo() );
+		//$out->addHTML( $this->getFanBoxes() );
 
 		if ( !Hooks::run( 'UserProfileEndLeft', [ &$userProfilePage ] ) ) {
 			$logger->debug( "{method}: UserProfileEndLeft messed up profile!\n", [
@@ -229,7 +233,11 @@ class UserProfilePage extends Article {
 		$stats = new UserStats( $this->profileOwner->getId(), $this->profileOwner->getName() );
 		$stats_data = $stats->getUserStats();
 
-		$total_value = $stats_data['edits'];
+		$total_value = $stats_data['edits'] . $stats_data['votes'] .
+						$stats_data['comments'] . $stats_data['recruits'] .
+						$stats_data['poll_votes'] .
+						$stats_data['picture_game_votes'] .
+						$stats_data['quiz_points'];
 
 		if ( $total_value != 0 ) {
 			$output .= '<div class="user-section-heading">
@@ -249,12 +257,309 @@ class UserProfilePage extends Article {
 				$this->getUserStatsRow(
 					wfMessage( 'user-stats-edits', $stats_data['edits'] )->escaped(),
 					$stats_data['edits']
+				) .
+				$this->getUserStatsRow(
+					wfMessage( 'user-stats-votes', $stats_data['votes'] )->escaped(),
+					$stats_data['votes']
+				) .
+				$this->getUserStatsRow(
+					wfMessage( 'user-stats-comments', $stats_data['comments'] )->escaped(),
+					$stats_data['comments'] ) .
+				$this->getUserStatsRow(
+					wfMessage( 'user-stats-recruits', $stats_data['recruits'] )->escaped(),
+					$stats_data['recruits']
+				) .
+				$this->getUserStatsRow(
+					wfMessage( 'user-stats-poll-votes', $stats_data['poll_votes'] )->escaped(),
+					$stats_data['poll_votes']
+				) .
+				$this->getUserStatsRow(
+					wfMessage( 'user-stats-picture-game-votes', $stats_data['picture_game_votes'] )->escaped(),
+					$stats_data['picture_game_votes']
+				) .
+				$this->getUserStatsRow(
+					wfMessage( 'user-stats-quiz-points', $stats_data['quiz_points'] )->escaped(),
+					$stats_data['quiz_points']
 				);
+			if ( $stats_data['currency'] != '10000' ) {
+				$output .= $this->getUserStatsRow(
+					wfMessage( 'user-stats-pick-points', $stats_data['currency'] )->escaped(),
+					$stats_data['currency']
+				);
+			}
 			$output .= '</div>';
 		}
 
 		return $output;
 	}
+
+	/**
+	 * Get three of the polls the user has created and cache the data in
+	 * memcached.
+	 *
+	 * @return array
+	 */
+	/*function getUserPolls() {
+	}*/
+
+	/**
+	 * Get three of the quiz games the user has created and cache the data in
+	 * memcached.
+	 *
+	 * @return array
+	 */
+	/*function getUserQuiz() {
+		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
+
+		$quiz = [];
+		$logger = LoggerFactory::getInstance( 'SocialProfile' );
+
+		// Try cache
+		$key = $cache->makeKey( 'user', 'profile', 'quiz', $this->user_id );
+		$data = $cache->get( $key );
+
+		if ( $data ) {
+			$logger->debug( "Got profile quizzes for user name {user_name} from cache\n", [
+				'user_name' => $this->profileOwner->getName()
+			] );
+
+			$quiz = $data;
+		} else {
+			$logger->debug( "Got profile quizzes for user name {user_name} from DB\n", [
+				'user_name' => $this->profileOwner->getName()
+			] );
+
+			$dbr = wfGetDB( DB_REPLICA );
+			$res = $dbr->select(
+				'quizgame_questions',
+				[ 'q_id', 'q_text', 'q_date' ],
+				[
+					'q_actor' => $this->profileOwner->getActorId(),
+					'q_flag' => 0 // the same as QuizGameHome::$FLAG_NONE
+				],
+				__METHOD__,
+				[
+					'ORDER BY' => 'q_id DESC',
+					'LIMIT' => 3
+				]
+			);
+			foreach ( $res as $row ) {
+				$quiz[] = [
+					'id' => $row->q_id,
+					'text' => $row->q_text,
+					'timestamp' => wfTimestamp( TS_UNIX, $row->q_date )
+				];
+			}
+			$cache->set( $key, $quiz );
+		}
+
+		return $quiz;
+	}*/
+
+	/**
+	 * Get three of the picture games the user has created and cache the data
+	 * in memcached.
+	 *
+	 * @return array
+	 */
+	/*function getUserPicGames() {
+		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
+
+		$pics = [];
+		$logger = LoggerFactory::getInstance( 'SocialProfile' );
+
+		// Try cache
+		$key = $cache->makeKey( 'user', 'profile', 'picgame', $this->user_id );
+		$data = $cache->get( $key );
+		if ( $data ) {
+			$logger->debug( "Got profile picgames for user name {user_name} from cache\n", [
+				'user_name' => $this->profileOwner->getName()
+			] );
+
+			$pics = $data;
+		} else {
+			$logger->debug( "Got profile picgames for user name {user_name} from DB\n", [
+				'user_name' => $this->profileOwner->getName()
+			] );
+
+			$dbr = wfGetDB( DB_REPLICA );
+			$res = $dbr->select(
+				'picturegame_images',
+				[ 'id', 'title', 'img1', 'img2', 'pg_date' ],
+				[
+					'actor' => $this->profileOwner->getActorId(),
+					'flag' => 0 // PictureGameHome::$FLAG_NONE
+				],
+				__METHOD__,
+				[
+					'ORDER BY' => 'id DESC',
+					'LIMIT' => 3
+				]
+			);
+			foreach ( $res as $row ) {
+				$pics[] = [
+					'id' => $row->id,
+					'title' => $row->title,
+					'img1' => $row->img1,
+					'img2' => $row->img2,
+					'timestamp' => wfTimestamp( TS_UNIX, $row->pg_date )
+				];
+			}
+			$cache->set( $key, $pics );
+		}
+
+		return $pics;
+	}*/
+
+	/**
+	 * Get the casual games (polls, quizzes and picture games) that the user
+	 * has created if $wgUserProfileDisplay['games'] is set to true and the
+	 * PictureGame, PollNY and QuizGame extensions have been installed.
+	 *
+	 * @return string HTML or nothing if this feature isn't enabled
+	 */
+	/*function getCasualGames() {
+		global $wgUserProfileDisplay;
+
+		if ( $wgUserProfileDisplay['games'] == false ) {
+			return '';
+		}
+
+		$output = '';
+
+		// Safe titles
+		$quiz_title = SpecialPage::getTitleFor( 'QuizGameHome' );
+		$pic_game_title = SpecialPage::getTitleFor( 'PictureGameHome' );
+
+		// Combine the queries
+		$combined_array = [];
+
+		$registry = ExtensionRegistry::getInstance();
+		if ( $registry->isLoaded( 'QuizGame' ) ) {
+			$quizzes = $this->getUserQuiz();
+			foreach ( $quizzes as $quiz ) {
+				$combined_array[] = [
+					'type' => 'Quiz',
+					'id' => $quiz['id'],
+					'text' => $quiz['text'],
+					'timestamp' => $quiz['timestamp']
+				];
+			}
+		}
+
+		if ( $registry->isLoaded( 'PollNY' ) ) {
+			$polls = $this->getUserPolls();
+			foreach ( $polls as $poll ) {
+				$combined_array[] = [
+					'type' => 'Poll',
+					'title' => $poll['title'],
+					'timestamp' => $poll['timestamp']
+				];
+			}
+		}
+
+		if ( $registry->isLoaded( 'PictureGame' ) ) {
+			$pics = $this->getUserPicGames();
+			foreach ( $pics as $pic ) {
+				$combined_array[] = [
+					'type' => 'Picture Game',
+					'id' => $pic['id'],
+					'title' => $pic['title'],
+					'img1' => $pic['img1'],
+					'img2' => $pic['img2'],
+					'timestamp' => $pic['timestamp']
+				];
+			}
+		}
+
+		usort( $combined_array, [ 'UserProfilePage', 'sortItems' ] );
+
+		if ( count( $combined_array ) > 0 ) {
+			$output .= '<div class="user-section-heading">
+				<div class="user-section-title">' .
+					wfMessage( 'casual-games-title' )->escaped() . '
+				</div>
+				<div class="user-section-actions">
+					<div class="action-right">
+					</div>
+					<div class="action-left">
+					</div>
+					<div class="visualClear"></div>
+				</div>
+			</div>
+			<div class="visualClear"></div>
+			<div class="casual-game-container">';
+
+			$x = 1;
+
+			if ( method_exists( MediaWikiServices::class, 'getRepoGroup' ) ) {
+				// MediaWiki 1.34+
+				$repoGroup = MediaWikiServices::getInstance()->getRepoGroup();
+			} else {
+				$repoGroup = RepoGroup::singleton();
+			}
+			foreach ( $combined_array as $item ) {
+				$output .= ( ( $x == 1 ) ? '<p class="item-top">' : '<p>' );
+
+				if ( $item['type'] == 'Poll' ) {
+					$ns = ( defined( 'NS_POLL' ) ? NS_POLL : 300 );
+					$poll_title = Title::makeTitle( $ns, $item['title'] );
+					$casual_game_title = wfMessage( 'casual-game-poll' )->escaped();
+					$output .= '<a href="' . htmlspecialchars( $poll_title->getFullURL() ) .
+						"\" rel=\"nofollow\">" .
+						htmlspecialchars( $poll_title->getText() ) .
+						"</a>
+						<span class=\"item-small\">{$casual_game_title}</span>";
+				}
+
+				if ( $item['type'] == 'Quiz' ) {
+					$casual_game_title = wfMessage( 'casual-game-quiz' )->escaped();
+					$output .= '<a href="' .
+						htmlspecialchars( $quiz_title->getFullURL( 'questionGameAction=renderPermalink&permalinkID=' . $item['id'] ) ) .
+						"\" rel=\"nofollow\">" .
+						htmlspecialchars( $item['text'] ) .
+						"</a>
+						<span class=\"item-small\">{$casual_game_title}</span>";
+				}
+
+				if ( $item['type'] == 'Picture Game' ) {
+					if ( $item['img1'] != '' && $item['img2'] != '' ) {
+						$image_1 = $image_2 = '';
+						$render_1 = $repoGroup->findFile( $item['img1'] );
+						if ( is_object( $render_1 ) ) {
+							$thumb_1 = $render_1->transform( [ 'width' => 25 ] );
+							$image_1 = $thumb_1->toHtml();
+						}
+
+						$render_2 = $repoGroup->findFile( $item['img2'] );
+						if ( is_object( $render_2 ) ) {
+							$thumb_2 = $render_2->transform( [ 'width' => 25 ] );
+							$image_2 = $thumb_2->toHtml();
+						}
+
+						$casual_game_title = wfMessage( 'casual-game-picture-game' )->escaped();
+
+						$output .= '<a href="' .
+							htmlspecialchars( $pic_game_title->getFullURL( 'picGameAction=renderPermalink&id=' . $item['id'] ) ) .
+							"\" rel=\"nofollow\">
+								{$image_1}
+								{$image_2}
+								" . htmlspecialchars( $item['title'] ) .
+							"</a>
+							<span class=\"item-small\">{$casual_game_title}</span>";
+					}
+				}
+
+				$output .= '</p>';
+
+				$x++;
+			}
+
+			$output .= '</div>';
+		}
+
+		return $output;
+	}*/
 
 	static function sortItems( $x, $y ) {
 		if ( $x['timestamp'] == $y['timestamp'] ) {
@@ -649,6 +954,7 @@ class UserProfilePage extends Article {
 		$profile_data = $this->profile_data;
 
 		// Safe URLs
+		//$give_gift = SpecialPage::getTitleFor( 'GiveGift', $this->profileOwner->getName() );
 		$update_profile = SpecialPage::getTitleFor( 'UpdateProfile' );
 		$watchlist = SpecialPage::getTitleFor( 'Watchlist' );
 		$contributions = SpecialPage::getTitleFor( 'Contributions', $this->profileOwner->getName() );
@@ -717,6 +1023,21 @@ class UserProfilePage extends Article {
 				<div id="profile-title">' .
 					htmlspecialchars( $this->profileOwner->getName() ) .
 				'</div>';
+		// Show the user's level and the amount of points they have if
+		// UserLevels has been configured
+		/*if ( $wgUserLevels ) {
+			$output .= '<div id="points-level">
+					<a href="' . htmlspecialchars( $level_link->getFullURL() ) . '">' .
+						wfMessage(
+							'user-profile-points',
+							$language->formatNum( $stats_data['points'] )
+						)->escaped() .
+					'</a>
+					</div>
+					<div id="honorific-level">
+						<a href="' . htmlspecialchars( $level_link->getFullURL() ) . '" rel="nofollow">(' . htmlspecialchars( $user_level->getLevelName() ) . ')</a>
+					</div>';
+		}*/
 		$output .= '<div class="visualClear"></div>
 			</div>
 			<div class="profile-actions">';
@@ -735,6 +1056,10 @@ class UserProfilePage extends Article {
 				'AddRelationship',
 				$this->profileOwner->getName() . '/friend'
 			);
+			/*$add_foe = SpecialPage::getTitleFor(
+				'AddRelationship',
+				$this->profileOwner->getName() . '/foe'
+			);*/
 			$remove_relationship = SpecialPage::getTitleFor(
 				'RemoveRelationship',
 				$this->profileOwner->getName()
@@ -743,11 +1068,18 @@ class UserProfilePage extends Article {
 			if ( $relationship == false ) {
 				$profileLinks['user-add-friend'] =
 					'<a href="' . htmlspecialchars( $add_friend->getFullURL() ) . '" rel="nofollow">' . wfMessage( 'user-add-friend' )->escaped() . '</a>';
+
+				/*$profileLinks['user-add-foe'] =
+					'<a href="' . htmlspecialchars( $add_foe->getFullURL() ) . '" rel="nofollow">' . wfMessage( 'user-add-foe' )->escaped() . '</a>';*/
 			} else {
 				if ( $relationship == 1 ) {
 					$profileLinks['user-remove-friend'] =
 						'<a href="' . htmlspecialchars( $remove_relationship->getFullURL() ) . '">' . wfMessage( 'user-remove-friend' )->escaped() . '</a>';
 				}
+				/*if ( $relationship == 2 ) {
+					$profileLinks['user-remove-foe'] =
+						'<a href="' . htmlspecialchars( $remove_relationship->getFullURL() ) . '">' . wfMessage( 'user-remove-foe' )->escaped() . '</a>';
+				}*/
 			}
 
 			global $wgUserBoard;
@@ -759,6 +1091,9 @@ class UserProfilePage extends Article {
 					] ) ) . '" rel="nofollow">' .
 					wfMessage( 'user-send-message' )->escaped() . '</a>';
 			}
+			/*$profileLinks['user-send-gift'] =
+				'<a href="' . htmlspecialchars( $give_gift->getFullURL() ) . '" rel="nofollow">' .
+				wfMessage( 'user-send-gift' )->escaped() . '</a>';*/
 		}
 
 		$profileLinks['user-contributions'] =
@@ -816,6 +1151,7 @@ class UserProfilePage extends Article {
 	 *
 	 * @param int $rel_type
 	 * - 1 for friends
+	 * - 2 (or anything else than 1) for foes
 	 *
 	 * @return string
 	 */
@@ -832,7 +1168,9 @@ class UserProfilePage extends Article {
 				return '';
 			}
 		} else {
-			return '';
+			/*if ( $wgUserProfileDisplay['foes'] == false ) {
+				return '';
+			}*/
 		}
 
 		$output = ''; // Prevent E_NOTICE
@@ -863,6 +1201,8 @@ class UserProfilePage extends Article {
 			$relationship_count = $stats_data['friend_count'];
 			$relationship_title = wfMessage( 'user-friends-title' )->escaped();
 		} else {
+			//$relationship_count = $stats_data['foe_count'];
+			//$relationship_title = wfMessage( 'user-foes-title' )->escaped();
 		}
 
 		if ( count( $friends ) > 0 ) {
@@ -944,6 +1284,8 @@ class UserProfilePage extends Article {
 
 		$limit = 8;
 		$rel = new UserActivity( $this->profileOwner, 'user', $limit );
+		$rel->setActivityToggle( 'show_votes', 0 );
+		$rel->setActivityToggle( 'show_gifts_sent', 1 );
 
 		/**
 		 * Get all relationship activity
@@ -977,6 +1319,26 @@ class UserProfilePage extends Article {
 				$item_html = '';
 				$title = Title::makeTitle( $item['namespace'], $item['pagetitle'] );
 				$user_title = Title::makeTitle( NS_USER, $item['username'] );
+				// It's really weird that a field called "comment" is really a title
+				$user_title_2 = Title::makeTitle( NS_USER, $item['comment'] );
+
+				if ( $user_title_2 ) {
+					$user_link_2 = '<a href="' . htmlspecialchars( $user_title_2->getFullURL() ) . '" rel="nofollow">' .
+						// @phan-suppress-next-line SecurityCheck-DoubleEscaped Not sure but might be a false alarm
+						htmlspecialchars( $item['comment'] ) . '</a>';
+				}
+
+				$comment_url = '';
+				if ( $item['type'] == 'comment' ) {
+					$comment_url = "#comment-{$item['id']}";
+				}
+
+				$page_link = '<b><a href="' . htmlspecialchars( $title->getFullURL() ) .
+					"{$comment_url}\">" . htmlspecialchars( $title->getPrefixedText() ) . '</a></b> ';
+				$b = new UserBoard(); // Easier than porting the time-related functions here
+				$item_time = '<span class="item-small">' .
+					wfMessage( 'user-time-ago', $b->getTimeAgo( $item['timestamp'] ) )->escaped() .
+				'</span>';
 
 				if ( $x < $style_limit ) {
 					$class = 'activity-item';
@@ -994,12 +1356,65 @@ class UserProfilePage extends Article {
 					case 'edit':
 						$item_html .= wfMessage( 'user-recent-activity-edit' )->escaped() . " {$page_link} {$item_time}
 							<div class=\"item\">";
+						if ( $item['comment'] ) {
+							$item_html .= "\"{$item['comment']}\"";
+						}
 						$item_html .= '</div>';
 						break;
+					/*case 'vote':
+						$item_html .= wfMessage( 'user-recent-activity-vote' )->escaped() . " {$page_link} {$item_time}";
+						break;
+					case 'comment':
+						$item_html .= wfMessage( 'user-recent-activity-comment' )->escaped() . " {$page_link} {$item_time}
+							<div class=\"item\">
+								\"{$item['comment']}\"
+							</div>";
+						break;*/
+					/*case 'gift-sent':
+						$userGiftIcon = new UserGiftIcon( $item['namespace'], 'm' );
+						$icon = $userGiftIcon->getIconHTML();
+
+						$item_html .= wfMessage( 'user-recent-activity-gift-sent' )->escaped() . " {$user_link_2} {$item_time}
+						<div class=\"item\">
+							<a href=\"" . htmlspecialchars( $viewGift->getFullURL( "gift_id={$item['id']}" ) ) . "\" rel=\"nofollow\">
+								{$icon}" .
+								htmlspecialchars( $item['pagetitle'] ) .
+							'</a>
+						</div>';
+						break;*/
+					case 'gift-rec':
+						$userGiftIcon = new UserGiftIcon( $item['namespace'], 'm' );
+						$icon = $userGiftIcon->getIconHTML();
+
+						$item_html .= wfMessage( 'user-recent-activity-gift-rec' )->escaped() . " {$user_link_2} {$item_time}
+								<div class=\"item\">
+									<a href=\"" . htmlspecialchars( $viewGift->getFullURL( "gift_id={$item['id']}" ) ) . "\" rel=\"nofollow\">
+										{$icon}" .
+										htmlspecialchars( $item['pagetitle'] ) .
+									'</a>
+								</div>';
+						break;
+					/*case 'system_gift':
+						$systemGiftIcon = new SystemGiftIcon( $item['namespace'], 'm' );
+						$icon = $systemGiftIcon->getIconHTML();
+
+						$viewSystemGift = SpecialPage::getTitleFor( 'ViewSystemGift' );
+						$item_html .= wfMessage( 'user-recent-system-gift' )->escaped() . " {$item_time}
+								<div class=\"user-home-item-gift\">
+									<a href=\"" . htmlspecialchars( $viewSystemGift->getFullURL( "gift_id={$item['id']}" ) ) . "\" rel=\"nofollow\">
+										{$icon}" .
+										htmlspecialchars( $item['pagetitle'] ) .
+									'</a>
+								</div>';
+						break;*/
 					case 'friend':
 						$item_html .= wfMessage( 'user-recent-activity-friend' )->escaped() .
 							" <b>{$user_link_2}</b> {$item_time}";
 						break;
+					/*case 'foe':
+						$item_html .= wfMessage( 'user-recent-activity-foe' )->escaped() .
+							" <b>{$user_link_2}</b> {$item_time}";
+						break;*/
 					case 'system_message':
 						$item_html .= "{$item['comment']} {$item_time}";
 						break;
@@ -1015,6 +1430,19 @@ class UserProfilePage extends Article {
 								\"{$item['namespace']}\"
 								</div>";
 						break;
+					/*case 'network_update':
+						$network_image = SportsTeams::getLogo( $item['sport_id'], $item['team_id'], 's' );
+						$item_html .= wfMessage( 'user-recent-activity-network-update' )->escaped() .
+								'<div class="item">
+									<a href="' . htmlspecialchars(
+										SpecialPage::getTitleFor( 'FanHome' )->getFullURL( [
+											'sport_id' => $item['sport_id'],
+											'team_id' => $item['team_id']
+										] )
+									) .
+									"\" rel=\"nofollow\">{$network_image} \"{$item['comment']}\"</a>
+								</div>";
+						break;*/
 				}
 
 				$item_html .= '</div>';
@@ -1036,6 +1464,200 @@ class UserProfilePage extends Article {
 
 		return $output;
 	}
+
+	/*function getGifts() {
+		global $wgUserProfileDisplay;
+
+		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
+
+		// If not enabled in site settings, don't display
+		if ( $wgUserProfileDisplay['gifts'] == false ) {
+			return '';
+		}
+
+		$output = '';
+
+		// User to user gifts
+		$g = new UserGifts( $this->profileOwner );
+
+		// Try cache
+		$key = $cache->makeKey( 'user', 'profile', 'gifts', 'actor_id', "{$this->profileOwner->getActorId()}" );
+		$data = $cache->get( $key );
+
+		$logger = LoggerFactory::getInstance( 'SocialProfile' );
+
+		if ( !$data ) {
+			$logger->debug( "Got profile gifts for user {user_name} from DB\n", [
+				'user_name' => $this->profileOwner->getName()
+			] );
+
+			$gifts = $g->getUserGiftList( 0, 4 );
+			$cache->set( $key, $gifts, 60 * 60 * 4 );
+		} else {
+			$logger->debug( "Got profile gifts for user {user_name} from cache\n", [
+				'user_name' => $this->profileOwner->getName()
+			] );
+			$gifts = $data;
+		}
+
+		$gift_count = $g->getGiftCountByUsername( $this->profileOwner );
+		$gift_link = SpecialPage::getTitleFor( 'ViewGifts' );
+		$per_row = 4;
+
+		if ( $gifts ) {
+			$output .= '<div class="user-section-heading">
+				<div class="user-section-title">' .
+					wfMessage( 'user-gifts-title' )->escaped() .
+				'</div>
+				<div class="user-section-actions">
+					<div class="action-right">';
+			if ( $gift_count > 4 ) {
+				$output .= '<a href="' . htmlspecialchars( $gift_link->getFullURL( [ 'user' => $this->profileOwner->getName() ] ) ) . '" rel="nofollow">' .
+					wfMessage( 'user-view-all' )->escaped() . '</a>';
+			}
+			$output .= '</div>
+					<div class="action-left">';
+			if ( $gift_count > 4 ) {
+				$output .= wfMessage( 'user-count-separator', '4', $gift_count )->escaped();
+			} else {
+				$output .= wfMessage( 'user-count-separator', $gift_count, $gift_count )->escaped();
+			}
+			$output .= '</div>
+					<div class="visualClear"></div>
+				</div>
+			</div>
+			<div class="visualClear"></div>
+			<div class="user-gift-container">';
+
+			$x = 1;
+
+			foreach ( $gifts as $gift ) {
+				if ( $gift['status'] == 1 && $this->profileOwner->getName() == $this->viewingUser->getName() ) {
+					$g->clearUserGiftStatus( $gift['id'] );
+					$cache->delete( $key );
+				}
+
+				$userGiftIcon = new UserGiftIcon( $gift['gift_id'], 'ml' );
+				$icon = $userGiftIcon->getIconHTML();
+				$gift_link = SpecialPage::getTitleFor( 'ViewGift' );
+				$class = '';
+				if ( $gift['status'] == 1 ) {
+					$class = 'class="user-page-new"';
+				}
+				$output .= '<a href="' . htmlspecialchars( $gift_link->getFullURL( [ 'gift_id' => $gift['id'] ] ) ) . '" ' .
+					$class . " rel=\"nofollow\">{$icon}</a>";
+				if ( $x == count( $gifts ) || $x != 1 && $x % $per_row == 0 ) {
+					$output .= '<div class="visualClear"></div>';
+				}
+
+				$x++;
+			}
+
+			$output .= '</div>';
+		}
+
+		return $output;
+	}*/
+
+	/*function getAwards() {
+		global $wgUserProfileDisplay;
+
+		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
+
+		// If not enabled in site settings, don't display
+		if ( $wgUserProfileDisplay['awards'] == false ) {
+			return '';
+		}
+
+		$output = '';
+
+		// System gifts
+		$sg = new UserSystemGifts( $this->profileOwner );
+
+		$logger = LoggerFactory::getInstance( 'SocialProfile' );
+
+		// Try cache
+		$sg_key = $cache->makeKey( 'user', 'profile', 'system_gifts', 'actor_id', "{$this->profileOwner->getActorId()}" );
+		$data = $cache->get( $sg_key );
+
+		if ( !$data ) {
+			$logger->debug( "Got profile awards for user {user_name} from DB\n", [
+				'user_name' => $this->profileOwner->getName()
+			] );
+
+			$listLookup = new SystemGiftListLookup( 4 );
+			$systemGifts = $listLookup->getUserGiftList( $this->profileOwner );
+			$cache->set( $sg_key, $systemGifts, 60 * 60 * 4 );
+		} else {
+			$logger->debug( "Got profile awards for user {user_name} from cache\n", [
+				'user_name' => $this->profileOwner->getName()
+			] );
+
+			$systemGifts = $data;
+		}
+
+		$system_gift_count = $sg->getGiftCountByUsername( $this->profileOwner );
+		$system_gift_link = SpecialPage::getTitleFor( 'ViewSystemGifts' );
+		$per_row = 4;
+
+		if ( $systemGifts ) {
+			$x = 1;
+
+			$output .= '<div class="user-section-heading">
+				<div class="user-section-title">' .
+					wfMessage( 'user-awards-title' )->escaped() .
+				'</div>
+				<div class="user-section-actions">
+					<div class="action-right">';
+			if ( $system_gift_count > 4 ) {
+				$output .= '<a href="' . htmlspecialchars( $system_gift_link->getFullURL( [ 'user' => $this->profileOwner->getName() ] ) ) . '" rel="nofollow">' .
+					wfMessage( 'user-view-all' )->escaped() . '</a>';
+			}
+			$output .= '</div>
+					<div class="action-left">';
+			if ( $system_gift_count > 4 ) {
+				$output .= wfMessage( 'user-count-separator', '4', $system_gift_count )->escaped();
+			} else {
+				$output .= wfMessage( 'user-count-separator', $system_gift_count, $system_gift_count )->escaped();
+			}
+			$output .= '</div>
+					<div class="visualClear"></div>
+				</div>
+			</div>
+			<div class="visualClear"></div>
+			<div class="user-gift-container">';
+
+			foreach ( $systemGifts as $gift ) {
+				if ( $gift['status'] == 1 && $this->profileOwner->getName() == $this->viewingUser->getName() ) {
+					$sg->clearUserGiftStatus( $gift['id'] );
+					$cache->delete( $sg_key );
+				}
+
+				$systemGiftIcon = new SystemGiftIcon( $gift['gift_id'], 'ml' );
+				$icon = $systemGiftIcon->getIconHTML();
+
+				$gift_link = SpecialPage::getTitleFor( 'ViewSystemGift' );
+
+				$class = '';
+				if ( $gift['status'] == 1 ) {
+					$class = 'class="user-page-new"';
+				}
+				$output .= '<a href="' . htmlspecialchars( $gift_link->getFullURL( [ 'gift_id' => $gift['id'] ] ) ) .
+					'" ' . $class . " rel=\"nofollow\">
+					{$icon}
+				</a>";
+
+				if ( $x == count( $systemGifts ) || $x != 1 && $x % $per_row == 0 ) {
+					$output .= '<div class="visualClear"></div>';
+				}
+				$x++;
+			}
+
+			$output .= '</div>';
+		}
+
+		return $output;
+	}*/
 
 	/**
 	 * Get the user board for a given user.
