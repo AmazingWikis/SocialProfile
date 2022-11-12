@@ -153,10 +153,10 @@ class UserProfilePage extends Article {
 		$out->addHTML( $this->getRelationships( 1 ) );
 		$out->addHTML( $this->getRelationships( 2 ) );
 		$out->addHTML( $this->getUserStats() );
+		$out->addHTML( $this->getInterests() );
 		//$out->addHTML( $this->getGifts() );
 		//$out->addHTML( $this->getAwards() );
 		//$out->addHTML( $this->getCustomInfo() );
-		$out->addHTML( $this->getInterests() );
 		//$out->addHTML( $this->getFanBoxes() );
 
 		if ( !Hooks::run( 'UserProfileEndLeft', [ &$userProfilePage ] ) ) {
@@ -954,7 +954,7 @@ class UserProfilePage extends Article {
 		$profile_data = $this->profile_data;
 
 		// Safe URLs
-		$give_gift = SpecialPage::getTitleFor( 'GiveGift', $this->profileOwner->getName() );
+		//$give_gift = SpecialPage::getTitleFor( 'GiveGift', $this->profileOwner->getName() );
 		$update_profile = SpecialPage::getTitleFor( 'UpdateProfile' );
 		$watchlist = SpecialPage::getTitleFor( 'Watchlist' );
 		$contributions = SpecialPage::getTitleFor( 'Contributions', $this->profileOwner->getName() );
@@ -1025,7 +1025,7 @@ class UserProfilePage extends Article {
 				'</div>';
 		// Show the user's level and the amount of points they have if
 		// UserLevels has been configured
-		if ( $wgUserLevels ) {
+		/*if ( $wgUserLevels ) {
 			$output .= '<div id="points-level">
 					<a href="' . htmlspecialchars( $level_link->getFullURL() ) . '">' .
 						wfMessage(
@@ -1037,7 +1037,7 @@ class UserProfilePage extends Article {
 					<div id="honorific-level">
 						<a href="' . htmlspecialchars( $level_link->getFullURL() ) . '" rel="nofollow">(' . htmlspecialchars( $user_level->getLevelName() ) . ')</a>
 					</div>';
-		}
+		}*/
 		$output .= '<div class="visualClear"></div>
 			</div>
 			<div class="profile-actions">';
@@ -1091,9 +1091,9 @@ class UserProfilePage extends Article {
 					] ) ) . '" rel="nofollow">' .
 					wfMessage( 'user-send-message' )->escaped() . '</a>';
 			}
-			$profileLinks['user-send-gift'] =
+			/*$profileLinks['user-send-gift'] =
 				'<a href="' . htmlspecialchars( $give_gift->getFullURL() ) . '" rel="nofollow">' .
-				wfMessage( 'user-send-gift' )->escaped() . '</a>';
+				wfMessage( 'user-send-gift' )->escaped() . '</a>';*/
 		}
 
 		$profileLinks['user-contributions'] =
@@ -1361,7 +1361,7 @@ class UserProfilePage extends Article {
 						}
 						$item_html .= '</div>';
 						break;
-					case 'vote':
+					/*case 'vote':
 						$item_html .= wfMessage( 'user-recent-activity-vote' )->escaped() . " {$page_link} {$item_time}";
 						break;
 					case 'comment':
@@ -1369,8 +1369,8 @@ class UserProfilePage extends Article {
 							<div class=\"item\">
 								\"{$item['comment']}\"
 							</div>";
-						break;
-					case 'gift-sent':
+						break;*/
+					/*case 'gift-sent':
 						$userGiftIcon = new UserGiftIcon( $item['namespace'], 'm' );
 						$icon = $userGiftIcon->getIconHTML();
 
@@ -1381,7 +1381,7 @@ class UserProfilePage extends Article {
 								htmlspecialchars( $item['pagetitle'] ) .
 							'</a>
 						</div>';
-						break;
+						break;*/
 					case 'gift-rec':
 						$userGiftIcon = new UserGiftIcon( $item['namespace'], 'm' );
 						$icon = $userGiftIcon->getIconHTML();
@@ -1394,7 +1394,7 @@ class UserProfilePage extends Article {
 									'</a>
 								</div>';
 						break;
-					case 'system_gift':
+					/*case 'system_gift':
 						$systemGiftIcon = new SystemGiftIcon( $item['namespace'], 'm' );
 						$icon = $systemGiftIcon->getIconHTML();
 
@@ -1406,7 +1406,7 @@ class UserProfilePage extends Article {
 										htmlspecialchars( $item['pagetitle'] ) .
 									'</a>
 								</div>';
-						break;
+						break;*/
 					case 'friend':
 						$item_html .= wfMessage( 'user-recent-activity-friend' )->escaped() .
 							" <b>{$user_link_2}</b> {$item_time}";
@@ -1430,7 +1430,7 @@ class UserProfilePage extends Article {
 								\"{$item['namespace']}\"
 								</div>";
 						break;
-					case 'network_update':
+					/*case 'network_update':
 						$network_image = SportsTeams::getLogo( $item['sport_id'], $item['team_id'], 's' );
 						$item_html .= wfMessage( 'user-recent-activity-network-update' )->escaped() .
 								'<div class="item">
@@ -1442,7 +1442,7 @@ class UserProfilePage extends Article {
 									) .
 									"\" rel=\"nofollow\">{$network_image} \"{$item['comment']}\"</a>
 								</div>";
-						break;
+						break;*/
 				}
 
 				$item_html .= '</div>';
@@ -1465,7 +1465,7 @@ class UserProfilePage extends Article {
 		return $output;
 	}
 
-	function getGifts() {
+	/*function getGifts() {
 		global $wgUserProfileDisplay;
 
 		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
@@ -1557,7 +1557,7 @@ class UserProfilePage extends Article {
 		}
 
 		return $output;
-	}
+	}*/
 
 	/*function getAwards() {
 		global $wgUserProfileDisplay;
