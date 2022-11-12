@@ -20,23 +20,13 @@ class UserActivity {
 	/** @var int */
 	private $show_edits = 1;
 	/** @var int */
-	private $show_votes = 0;
-	/** @var int */
 	private $show_comments = 1;
 	/** @var int */
 	private $show_relationships = 1;
 	/** @var int */
-	private $show_gifts_sent = 0;
-	/** @var int */
-	private $show_gifts_rec = 1;
-	/** @var int */
-	private $show_system_gifts = 1;
-	/** @var int */
 	private $show_system_messages = 1;
 	/** @var int */
 	private $show_messages_sent = 1;
-	/** @var int */
-	private $show_network_updates = 0;
 	/** @var bool */
 	private $show_all;
 	/** @var int */
@@ -76,9 +66,6 @@ class UserActivity {
 		}
 		if ( strtoupper( $filter ) == 'FRIENDS' ) {
 			$this->rel_type = 1;
-		}
-		if ( strtoupper( $filter ) == 'FOES' ) {
-			$this->rel_type = 2;
 		}
 		if ( strtoupper( $filter ) == 'ALL' ) {
 			$this->show_all = true;
@@ -193,78 +180,6 @@ class UserActivity {
 		}
 	}
 
-	/**
-	 * Get recent votes from the Vote table (provided by VoteNY extension) and
-	 * set them in the appropriate class member variables.
-	 */
-	private function setVotes() {
-		$dbr = wfGetDB( DB_REPLICA );
-
-		# Bail out if Vote table doesn't exist
-		if ( !$dbr->tableExists( 'Vote' ) ) {
-			return;
-		}
-
-		$where = [];
-		$where[] = 'vote_page_id = page_id';
-
-		if ( $this->rel_type ) {
-			$users = $dbr->select(
-				'user_relationship',
-				'r_actor_relation',
-				[
-					'r_actor' => $this->user->getActorId(),
-					'r_type' => $this->rel_type
-				],
-				__METHOD__
-			);
-			$userArray = [];
-			foreach ( $users as $user ) {
-				$userArray[] = $user;
-			}
-			$actorIDs = implode( ',', $userArray );
-			if ( !empty( $actorIDs ) ) {
-				$where[] = "vote_actor IN ($actorIDs)";
-			}
-		}
-		if ( $this->show_current_user ) {
-			$where['vote_actor'] = $this->user->getActorId();
-		}
-
-		// @phan-suppress-next-line SecurityCheck-SQLInjection The escaping here is totally proper, phan just can't tell
-		$res = $dbr->select(
-			[ 'Vote', 'page' ],
-			[
-				'vote_date AS item_date', 'vote_actor',
-				'page_title', 'vote_count', 'comment_count', 'vote_ip'
-			],
-			$where,
-			__METHOD__,
-			[
-				'ORDER BY' => 'vote_date DESC',
-				'LIMIT' => $this->item_max,
-				'OFFSET' => 0
-			]
-		);
-
-		foreach ( $res as $row ) {
-			$user = User::newFromActorId( $row->vote_actor );
-			if ( !$user ) {
-				continue;
-			}
-			$this->items[] = [
-				'id' => 0,
-				'type' => 'vote',
-				'timestamp' => wfTimestamp( TS_UNIX, $row->vote_date ),
-				'pagetitle' => $row->page_title,
-				'namespace' => $row->page_namespace,
-				'username' => $user->getName(),
-				'comment' => '-',
-				'new' => '0',
-				'minor' => 0
-			];
-		}
-	}
 
 	/**
 	 * Get recent comments from the Comments table (provided by the Comments
@@ -365,260 +280,6 @@ class UserActivity {
 					'minor' => 0
 				];
 			}
-		}
-	}
-
-	/**
-	 * Get recently sent user-to-user gifts from the user_gift and gift tables
-	 * and set them in the appropriate class member variables.
-	 */
-	private function setGiftsSent() {
-		$dbr = wfGetDB( DB_REPLICA );
-
-		$where = [];
-
-		if ( $this->rel_type ) {
-			$users = $dbr->select(
-				'user_relationship',
-				'r_actor_relation',
-				[
-					'r_actor' => $this->user->getActorId(),
-					'r_type' => $this->rel_type
-				],
-				__METHOD__
-			);
-			$userArray = [];
-			foreach ( $users as $user ) {
-				$userArray[] = $user;
-			}
-			$actorIDs = implode( ',', $userArray );
-			if ( !empty( $actorIDs ) ) {
-				$where[] = "ug_actor_to IN ($actorIDs)";
-			}
-		}
-
-		if ( $this->show_current_user ) {
-			$where['ug_actor_from'] = $this->user->getActorId();
-		}
-
-		// @phan-suppress-next-line SecurityCheck-SQLInjection The escaping here is totally proper, phan just can't tell
-		$res = $dbr->select(
-			[ 'user_gift', 'gift' ],
-			[
-				'ug_id', 'ug_actor_from', 'ug_actor_to',
-				'ug_date', 'gift_name', 'gift_id'
-			],
-			$where,
-			__METHOD__,
-			[
-				'ORDER BY' => 'ug_id DESC',
-				'LIMIT' => $this->item_max,
-				'OFFSET' => 0
-			],
-			[ 'gift' => [ 'INNER JOIN', 'gift_id = ug_gift_id' ] ]
-		);
-
-		foreach ( $res as $row ) {
-			$giftSender = User::newFromActorId( $row->ug_actor_from );
-			$giftRecipient = User::newFromActorId( $row->ug_actor_to );
-			$this->items[] = [
-				'id' => $row->ug_id,
-				'type' => 'gift-sent',
-				'timestamp' => wfTimestamp( TS_UNIX, $row->ug_date ),
-				'pagetitle' => $row->gift_name,
-				'namespace' => $row->gift_id,
-				'username' => $giftSender->getName(),
-				'comment' => $giftRecipient->getName(),
-				'new' => '0',
-				'minor' => 0
-			];
-		}
-	}
-
-	/**
-	 * Get recently received user-to-user gifts from the user_gift and gift
-	 * tables and set them in the appropriate class member variables.
-	 */
-	private function setGiftsRec() {
-		$dbr = wfGetDB( DB_REPLICA );
-
-		$where = [];
-
-		if ( !empty( $this->rel_type ) ) {
-			$users = $dbr->select(
-				'user_relationship',
-				'r_actor_relation',
-				[
-					'r_actor' => $this->user->getActorId(),
-					'r_type' => $this->rel_type
-				],
-				__METHOD__
-			);
-			$userArray = [];
-			foreach ( $users as $user ) {
-				$userArray[] = $user;
-			}
-			$actorIDs = implode( ',', $userArray );
-			if ( !empty( $actorIDs ) ) {
-				$where[] = "ug_actor_to IN ($actorIDs)";
-			}
-		}
-
-		if ( !empty( $this->show_current_user ) ) {
-			$where['ug_actor_to'] = $this->user->getActorId();
-		}
-
-		// @phan-suppress-next-line SecurityCheck-SQLInjection The escaping here is totally proper, phan just can't tell
-		$res = $dbr->select(
-			[ 'user_gift', 'gift' ],
-			[
-				'ug_id', 'ug_actor_from', 'ug_actor_to',
-				'ug_date', 'gift_name', 'gift_id'
-			],
-			$where,
-			__METHOD__,
-			[
-				'ORDER BY' => 'ug_id DESC',
-				'LIMIT' => $this->item_max,
-				'OFFSET' => 0
-			],
-			[ 'gift' => [ 'INNER JOIN', 'gift_id = ug_gift_id' ] ]
-		);
-
-		foreach ( $res as $row ) {
-			$giftSender = User::newFromActorId( $row->ug_actor_from );
-			$giftRecipient = User::newFromActorId( $row->ug_actor_to );
-
-			$userGiftIcon = new UserGiftIcon( $row->gift_id, 'm' );
-			$icon = $userGiftIcon->getIconHTML();
-			$view_gift_link = SpecialPage::getTitleFor( 'ViewGift' );
-
-			$html = wfMessage( 'useractivity-gift',
-				'<b><a href="' . htmlspecialchars( $giftRecipient->getUserPage()->getFullURL() ) . "\">" . htmlspecialchars( $giftRecipient->getName() ) . "</a></b>",
-				'<a href="' . htmlspecialchars( $giftSender->getUserPage()->getFullURL() ) . "\">" . htmlspecialchars( $giftSender->getName() ) . "</a>"
-			)->text() .
-			"<div class=\"item\">
-				<a href=\"" . htmlspecialchars( $view_gift_link->getFullURL( 'gift_id=' . $row->ug_id ) ) . "\" rel=\"nofollow\">
-					{$icon}
-					" . htmlspecialchars( $row->gift_name ) . "
-				</a>
-			</div>";
-
-			$unixTS = wfTimestamp( TS_UNIX, $row->ug_date );
-
-			$this->activityLines[] = [
-				'type' => 'gift-rec',
-				'timestamp' => $unixTS,
-				'data' => ' ' . $html
-			];
-
-			$this->items[] = [
-				'id' => $row->ug_id,
-				'type' => 'gift-rec',
-				'timestamp' => $unixTS,
-				'pagetitle' => $row->gift_name,
-				'namespace' => $row->gift_id,
-				'username' => $giftRecipient->getName(),
-				'comment' => $giftSender->getName(),
-				'new' => '0',
-				'minor' => 0
-			];
-		}
-	}
-
-	/**
-	 * Get recently received system gifts (awards) from the user_system_gift
-	 * and system_gift tables and set them in the appropriate class member
-	 * variables.
-	 */
-	private function setSystemGiftsRec() {
-		$dbr = wfGetDB( DB_REPLICA );
-
-		$where = [];
-
-		if ( !empty( $this->rel_type ) ) {
-			$users = $dbr->select(
-				'user_relationship',
-				'r_actor_relation',
-				[
-					'r_actor' => $this->user->getActorId(),
-					'r_type' => $this->rel_type
-				],
-				__METHOD__
-			);
-			$userArray = [];
-			foreach ( $users as $user ) {
-				$userArray[] = $user;
-			}
-			$actorIDs = implode( ',', $userArray );
-			if ( !empty( $actorIDs ) ) {
-				$where[] = "sg_actor IN ($actorIDs)";
-			}
-		}
-
-		if ( !empty( $this->show_current_user ) ) {
-			$where['sg_actor'] = $this->user->getActorId();
-		}
-
-		// @phan-suppress-next-line SecurityCheck-SQLInjection The escaping here is totally proper, phan just can't tell
-		$res = $dbr->select(
-			[ 'user_system_gift', 'system_gift' ],
-			[
-				'sg_id', 'sg_actor', 'sg_date',
-				'gift_name', 'gift_id'
-			],
-			$where,
-			__METHOD__,
-			[
-				'ORDER BY' => 'sg_id DESC',
-				'LIMIT' => $this->item_max,
-				'OFFSET' => 0
-			],
-			[ 'system_gift' => [ 'INNER JOIN', 'gift_id = sg_gift_id' ] ]
-		);
-
-		foreach ( $res as $row ) {
-			$user = User::newFromActorId( $row->sg_actor );
-			if ( !$user ) {
-				continue;
-			}
-			$systemGiftIcon = new SystemGiftIcon( $row->gift_id, 'm' );
-			$icon = $systemGiftIcon->getIconHTML();
-
-			$system_gift_link = SpecialPage::getTitleFor( 'ViewSystemGift' );
-
-			// @todo FIXME: get rid of rawParams, there's literally no need for raw HTML
-			// in order to merely make a bolded link to the user's user page
-			$html = wfMessage( 'useractivity-award' )->rawParams(
-				'<b><a href="' . htmlspecialchars( $user->getUserPage()->getFullURL() ) . "\">" . htmlspecialchars( $user->getName() ) . "</a></b>",
-				htmlspecialchars( $user->getName() )
-			)->escaped() .
-			'<div class="item">
-				<a href="' . htmlspecialchars( $system_gift_link->getFullURL( 'gift_id=' . $row->sg_id ) ) . "\" rel=\"nofollow\">
-					{$icon}
-					" . htmlspecialchars( $row->gift_name ) . "
-				</a>
-			</div>";
-
-			$unixTS = wfTimestamp( TS_UNIX, $row->sg_date );
-
-			$this->activityLines[] = [
-				'type' => 'system_gift',
-				'timestamp' => $unixTS,
-				'data' => ' ' . $html
-			];
-
-			$this->items[] = [
-				'id' => $row->sg_id,
-				'type' => 'system_gift',
-				'timestamp' => $unixTS,
-				'pagetitle' => $row->gift_name,
-				'namespace' => $row->gift_id,
-				'username' => $user->getName(),
-				'comment' => '-',
-				'new' => '0',
-				'minor' => 0
-			];
 		}
 	}
 
@@ -897,151 +558,13 @@ class UserActivity {
 		}
 	}
 
-	/**
-	 * Get recent network updates (but only if the SportsTeams extension is
-	 * installed) and set them in the appropriate class member variables.
-	 */
-	private function setNetworkUpdates() {
-		global $wgLang;
-
-		if ( !ExtensionRegistry::getInstance()->isLoaded( 'SportsTeams' ) ) {
-			return;
-		}
-
-		$dbr = wfGetDB( DB_REPLICA );
-
-		$where = [];
-
-		if ( !empty( $this->rel_type ) ) {
-			$users = $dbr->select(
-				'user_relationship',
-				'r_actor_relation',
-				[
-					'r_actor' => $this->user->getActorId(),
-					'r_type' => $this->rel_type
-				],
-				__METHOD__
-			);
-
-			$actorIDs = [];
-			foreach ( $users as $user ) {
-				$actorIDs[] = $user;
-			}
-
-			if ( !empty( $actorIDs ) ) {
-				$where['us_actor'] = $actorIDs;
-			}
-		}
-
-		if ( $this->show_current_user ) {
-			$where['us_actor'] = $this->user->getActorId();
-		}
-
-		$res = $dbr->select(
-			'user_status',
-			[
-				'us_id', 'us_actor', 'us_text',
-				'us_date', 'us_sport_id', 'us_team_id'
-			],
-			$where,
-			__METHOD__,
-			[
-				'ORDER BY' => 'us_id DESC',
-				'LIMIT' => $this->item_max,
-				'OFFSET' => 0
-			]
-		);
-
-		foreach ( $res as $row ) {
-			if ( $row->us_team_id ) {
-				$team = SportsTeams::getTeam( $row->us_team_id );
-				$network_name = $team['name'];
-			} else {
-				$sport = SportsTeams::getSport( $row->us_sport_id );
-				$network_name = $sport['name'];
-			}
-			$unixTS = wfTimestamp( TS_UNIX, $row->us_date );
-			$user = User::newFromActorId( $row->us_actor );
-			$userName = $user->getName();
-
-			$this->items[] = [
-				'id' => $row->us_id,
-				'type' => 'network_update',
-				'timestamp' => $unixTS,
-				'pagetitle' => '',
-				'namespace' => '',
-				'username' => $userName,
-				'comment' => $this->fixItemComment( $row->us_text ),
-				'sport_id' => $row->us_sport_id,
-				'team_id' => $row->us_team_id,
-				'network' => $network_name
-			];
-
-			$user_name_short = $wgLang->truncateForVisual( $userName, 15 );
-
-			$sportsNetworkURL = htmlspecialchars(
-				SpecialPage::getTitleFor( 'FanHome' )->getFullURL( [
-					'sport_id' => $row->us_sport_id,
-					'team_id' => $row->us_team_id
-				] ),
-				ENT_QUOTES
-			);
-
-			$page_link = '<a href="' . $sportsNetworkURL . '" rel="nofollow">' .
-				htmlspecialchars( $network_name ) . '</a>';
-			$network_image = SportsTeams::getLogo( $row->us_sport_id, $row->us_team_id, 's' );
-
-			// FIXME: This message uses raw HTML
-			$html = wfMessage(
-				'useractivity-network-thought',
-				htmlspecialchars( $userName ),
-				// @phan-suppress-next-line SecurityCheck-DoubleEscaped T290624
-				htmlspecialchars( $user_name_short ),
-				$page_link,
-				htmlspecialchars( $user->getUserPage()->getFullURL() )
-			)->text() .
-					'<div class="item">
-						<a href="' . $sportsNetworkURL . "\" rel=\"nofollow\">
-							{$network_image}
-							\"" . htmlspecialchars( $row->us_text ) . "\"
-						</a>
-					</div>";
-
-			$this->activityLines[] = [
-				'type' => 'network_update',
-				'timestamp' => $unixTS,
-				'data' => $html,
-			];
-		}
-	}
-
 	public function getEdits() {
 		$this->setEdits();
 		return $this->items;
 	}
 
-	public function getVotes() {
-		$this->setVotes();
-		return $this->items;
-	}
-
 	public function getComments() {
 		$this->setComments();
-		return $this->items;
-	}
-
-	public function getGiftsSent() {
-		$this->setGiftsSent();
-		return $this->items;
-	}
-
-	public function getGiftsRec() {
-		$this->setGiftsRec();
-		return $this->items;
-	}
-
-	public function getSystemGiftsRec() {
-		$this->setSystemGiftsRec();
 		return $this->items;
 	}
 
@@ -1060,26 +583,12 @@ class UserActivity {
 		return $this->items;
 	}
 
-	public function getNetworkUpdates() {
-		$this->setNetworkUpdates();
-		return $this->items;
-	}
-
 	public function getActivityList() {
 		if ( $this->show_edits ) {
 			$this->setEdits();
 		}
-		if ( $this->show_votes ) {
-			$this->setVotes();
-		}
 		if ( $this->show_comments ) {
 			$this->setComments();
-		}
-		if ( $this->show_gifts_sent ) {
-			$this->setGiftsSent();
-		}
-		if ( $this->show_gifts_rec ) {
-			$this->setGiftsRec();
 		}
 		if ( $this->show_relationships ) {
 			$this->setRelationships();
@@ -1087,14 +596,8 @@ class UserActivity {
 		if ( $this->show_system_messages ) {
 			$this->getSystemMessages();
 		}
-		if ( $this->show_system_gifts ) {
-			$this->getSystemGiftsRec();
-		}
 		if ( $this->show_messages_sent ) {
 			$this->getMessagesSent();
-		}
-		if ( $this->show_network_updates ) {
-			$this->getNetworkUpdates();
 		}
 
 		if ( $this->items ) {
@@ -1114,9 +617,6 @@ class UserActivity {
 		}
 		if ( $this->show_relationships ) {
 			$this->simplifyPageActivity( 'friend' );
-		}
-		if ( $this->show_relationships ) {
-			$this->simplifyPageActivity( 'foe' );
 		}
 		if ( $this->show_messages_sent ) {
 			$this->simplifyPageActivity( 'user_message' );
@@ -1148,7 +648,7 @@ class UserActivity {
 			$users = '';
 			$pages = '';
 
-			if ( $type == 'friend' || $type == 'foe' || $type == 'user_message' ) {
+			if ( $type == 'friend' || $type == 'user_message' ) {
 				$page_title = Title::newFromText( $page_name, NS_USER );
 			} else {
 				$page_title = Title::newFromText( $page_name );
@@ -1200,7 +700,6 @@ class UserActivity {
 
 									if (
 										$type == 'friend' ||
-										$type == 'foe' ||
 										$type == 'user_message'
 									) {
 										$page_title2 = Title::newFromText( $page_name2, NS_USER );
@@ -1278,26 +777,14 @@ class UserActivity {
 		switch ( $type ) {
 			case 'edit':
 				return 'editIcon.gif';
-			case 'vote':
-				return 'voteIcon.gif';
 			case 'comment':
 				return 'comment.gif';
-			case 'gift-sent':
-				return 'icon_package.gif';
-			case 'gift-rec':
-				return 'icon_package_get.gif';
 			case 'friend':
 				return 'addedFriendIcon.png';
-			case 'foe':
-				return 'addedFoeIcon.png';
 			case 'system_message':
 				return 'challengeIcon.png';
-			case 'system_gift':
-				return 'awardIcon.png';
 			case 'user_message':
 				return 'emailIcon.gif';
-			case 'network_update':
-				return 'note.gif';
 		}
 	}
 

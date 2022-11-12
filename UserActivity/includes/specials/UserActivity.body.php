@@ -62,30 +62,14 @@ class UserHome extends SpecialPage {
 		if ( $item_type == 'edits' || $item_type == 'all' ) {
 			$edits = 1;
 		}
-		if ( $item_type == 'votes' || $item_type == 'all' ) {
-			// @phan-suppress-next-line PhanPluginRedundantAssignment
-			$votes = 0;
-		}
 		if ( $item_type == 'comments' || $item_type == 'all' ) {
 			$comments = 1;
-		}
-		if ( $item_type == 'gifts' || $item_type == 'all' ) {
-			$gifts = 1;
 		}
 		if ( $item_type == 'relationships' || $item_type == 'all' ) {
 			$relationships = 1;
 		}
-		if ( $item_type == 'advancements' || $item_type == 'all' ) {
-			$messages = 1;
-		}
-		if ( $item_type == 'awards' || $item_type == 'all' ) {
-			$system_gifts = 1;
-		}
 		if ( $item_type == 'messages' || $item_type == 'all' ) {
 			$messages_sent = 1;
-		}
-		if ( $item_type == 'thoughts' || $item_type == 'all' ) {
-			$network_updates = 1;
 		}
 
 		$linkRenderer = $this->getLinkRenderer();
@@ -146,14 +130,10 @@ class UserHome extends SpecialPage {
 
 		$rel = new UserActivity( $user, ( ( $rel_type == 1 ) ? ' friends' : 'foes' ), 50 );
 		$rel->setActivityToggle( 'show_edits', $edits );
-		$rel->setActivityToggle( 'show_votes', $votes );
 		$rel->setActivityToggle( 'show_comments', $comments );
-		$rel->setActivityToggle( 'show_gifts_rec', $gifts );
 		$rel->setActivityToggle( 'show_relationships', $relationships );
 		$rel->setActivityToggle( 'show_system_messages', $messages );
-		$rel->setActivityToggle( 'show_system_gifts', $system_gifts );
 		$rel->setActivityToggle( 'show_messages_sent', $messages_sent );
-		$rel->setActivityToggle( 'show_network_updates', $network_updates );
 
 		/**
 		 * Get all relationship activity
