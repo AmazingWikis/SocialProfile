@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Formatter for user relationship (friend/foe) notifications ('social-rel-*')
+ * Formatter for user relationship (friend) notifications ('social-rel-*')
  */
 class EchoUserRelationshipPresentationModel extends EchoEventPresentationModel {
 
@@ -11,9 +11,7 @@ class EchoUserRelationshipPresentationModel extends EchoEventPresentationModel {
 
 		if ( $relType == 1 ) { // friend added/pending friend request
 			return 'gratitude';
-		} elseif ( $eventType == 'social-rel-accept' && $relType != 1 ) { // foe added
-			return 'social-added';
-		} else { // pending friend or foe request
+		} else { // pending friend
 			// @todo FIXME: better icon
 			return 'placeholder';
 		}
@@ -29,11 +27,7 @@ class EchoUserRelationshipPresentationModel extends EchoEventPresentationModel {
 				$msg = 'notification-social-rel-add-friend-message';
 			} elseif ( $relType == 1 ) {
 				$msg = 'notification-social-rel-add-friend-no-message';
-			} elseif ( $relType !== 1 && $message ) {
-				$msg = 'notification-social-rel-add-foe-message';
-			} else {
-				$msg = 'notification-social-rel-add-foe-no-message';
-			}
+			} 
 			return $this->msg(
 				$msg,
 				$this->event->getAgent()->getName(),

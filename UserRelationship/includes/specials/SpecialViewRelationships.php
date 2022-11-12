@@ -6,7 +6,6 @@
  * Example URL: index.php?title=Special:ViewRelationships/Pean/foes (viewing foes)
  *
  * Example old URL: index.php?title=Special:ViewRelationships&user=Pean&rel_type=1 (viewing friends)
- * Example old URL: index.php?title=Special:ViewRelationships&user=Pean&rel_type=2 (viewing foes)
  *
  * @file
  * @ingroup Extensions

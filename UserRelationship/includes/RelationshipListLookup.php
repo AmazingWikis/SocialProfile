@@ -73,7 +73,6 @@ class RelationshipListLookup {
 	 *
 	 * @param int $type
 	 * - 1 for friends
-	 * - 2 (or anything else but 1) for foes
 	 * @param int $page If greater than 0, will be used to
 	 * calculate the OFFSET for the SQL query
 	 * @return array Array of relationship information

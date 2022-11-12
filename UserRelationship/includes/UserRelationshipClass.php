@@ -99,11 +99,6 @@ class UserRelationship {
 			$requestLink = SpecialPage::getTitleFor( 'ViewRelationshipRequests' );
 			$updateProfileLink = SpecialPage::getTitleFor( 'UpdateProfile' );
 
-			if ( trim( $userTo->getRealName() ) ) {
-				$name = $userTo->getRealName();
-			} else {
-				$name = $userTo->getName();
-			}
 			$userFrom = $this->user->getName();
 
 			if ( $type == 1 ) {
@@ -145,12 +140,8 @@ class UserRelationship {
 			$userFrom = $this->user;
 			$updateProfileLink = SpecialPage::getTitleFor( 'UpdateProfile' );
 
-			if ( trim( $user->getRealName() ) ) {
-				$name = $user->getRealName();
-			} else {
-				$name = $user->getName();
-			}
-
+			$userFrom = $this->user->getName();
+		
 			if ( $type == 1 ) {
 				$subject = wfMessage( 'friend_accept_subject', $userFrom->getName() )->text();
 				$body = [
@@ -188,11 +179,7 @@ class UserRelationship {
 			$userFrom = $this->user;
 			$updateProfileLink = SpecialPage::getTitleFor( 'UpdateProfile' );
 
-			if ( trim( $user->getRealName() ) ) {
-				$name = $user->getRealName();
-			} else {
-				$name = $user->getName();
-			}
+			$userFrom = $this->user->getName();
 
 			if ( $type == 1 ) {
 				$subject = wfMessage( 'friend_removed_subject', $userFrom->getName() )->text();

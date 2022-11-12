@@ -39,7 +39,7 @@
 		"ParserFirstCallInit": "UserStatsHooks::onParserFirstCallInit"
 	},
 	"DefaultUserOptions": {
-		"echo-subscriptions-web-social-level-up": true,
+		"echo-subscriptions-web-social-level-up": false,
 		"echo-subscriptions-email-social-level-up": false
 	},
 	"SpecialPages": {
@@ -53,32 +53,10 @@
 		"UserStatsTrackWeekly": false,
 		"UserStatsTrackMonthly": false,
 		"UserStatsPointValues": {
-			"edit": 50,
-			"vote": 0,
-			"comment": 0,
-			"comment_plus": 0,
-			"comment_ignored": 0,
-			"opinions_created": 0,
-			"opinions_pub": 0,
-			"referral_complete": 0,
-			"friend": 0,
-			"foe": 0,
-			"gift_rec": 0,
-			"gift_sent": 0,
-			"points_winner_weekly": 0,
-			"points_winner_monthly": 0,
-			"user_image": 1000,
-			"poll_vote": 0,
-			"quiz_points": 0,
-			"quiz_created": 0
 		},
 		"NamespacesForEditPoints": [
-			0
 		],
 		"RandomFeaturedUser": {
-			"about": true,
-			"avatar": true,
-			"points": true
 		}
 	},
 	"ResourceModules": {
