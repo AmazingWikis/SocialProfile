@@ -1,1 +1,0 @@
-DROP INDEX /*i*/ug_user_id_to ON /*_*/user_gift;

@@ -37,7 +37,6 @@ $wgExtensionMessagesFiles['AvatarMagic'] = __DIR__ . '/UserProfile/includes/avat
 if ( defined( 'MEDIAWIKI_INSTALL' ) ) {
 	$subext = [
 		__DIR__ . '/SystemGifts/extension.json' => 1,
-		//__DIR__ . '/UserGifts/extension.json' => 1,
 		__DIR__ . '/UserActivity/extension.json' => 1,
 		__DIR__ . '/UserBoard/extension.json' => 1,
 		__DIR__ . '/UserRelationship/extension.json' => 1,
@@ -91,7 +90,6 @@ $wgSpecialPages['UploadAvatar'] = 'SpecialUploadAvatar';
 
 // What to display on social profile pages by default?
 $wgUserProfileDisplay['board'] = true;
-//$wgUserProfileDisplay['foes'] = true;
 $wgUserProfileDisplay['friends'] = true;
 $wgUserProfileDisplay['avatar'] = true; // If set to false, disables both avatar display and upload
 
@@ -122,8 +120,7 @@ $wgAutoloadClasses['SocialProfileHooks'] = __DIR__ . '/SocialProfileHooks.php';
 // Loader files
 require_once __DIR__ . '/UserProfile/UserProfile.php'; // Profile page configuration loader file
 wfLoadExtensions( [
-	//'SocialProfile/UserGifts',
-	'SocialProfile/SystemGifts', // SystemGifts (awards functionality, friend system)
+	'SocialProfile/SystemGifts', // SystemGifts (friend system)
 	'SocialProfile/UserActivity', // UserActivity - recent social changes
 	'SocialProfile/UserBoard',
 	'SocialProfile/UserRelationship',

@@ -1,1 +1,0 @@
-ALTER TABLE gift ADD COLUMN gift_creator_actor INTEGER NOT NULL;

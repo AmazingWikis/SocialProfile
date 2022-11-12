@@ -1,1 +1,0 @@
-ALTER TABLE user_gift ADD COLUMN ug_actor_from INTEGER NOT NULL;
