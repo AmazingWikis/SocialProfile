@@ -20,8 +20,6 @@ class UserActivity {
 	/** @var int */
 	private $show_edits = 1;
 	/** @var int */
-	private $show_comments = 1;
-	/** @var int */
 	private $show_relationships = 1;
 	/** @var int */
 	private $show_system_messages = 1;
@@ -115,28 +113,7 @@ class UserActivity {
 			$where['actor_id'] = $this->user->getActorId();
 		}
 
-		$commentStore = CommentStore::getStore();
 		$actorQuery = ActorMigration::newMigration()->getJoin( 'rc_user' ); // @todo This usage is deprecated since MW 1.34.
-		$commentQuery = $commentStore->getJoin( 'rc_comment' );
-
-		// @phan-suppress-next-line SecurityCheck-SQLInjection The escaping here is totally proper, phan just can't tell
-		$res = $dbr->select(
-			[ 'recentchanges' ] + $commentQuery['tables'] + $actorQuery['tables'],
-			[
-				'rc_timestamp', 'rc_title',
-				'rc_id', 'rc_minor',
-				'rc_source', 'rc_namespace', 'rc_cur_id', 'rc_this_oldid',
-				'rc_last_oldid', 'rc_log_action'
-			] + $commentQuery['fields'] + $actorQuery['fields'],
-			$where,
-			__METHOD__,
-			[
-				'ORDER BY' => 'rc_id DESC',
-				'LIMIT' => $this->item_max,
-				'OFFSET' => 0
-			],
-			$commentQuery['joins'] + $actorQuery['joins']
-		);
 
 		foreach ( $res as $row ) {
 			// Special pages aren't editable, so ignore them
@@ -156,8 +133,6 @@ class UserActivity {
 				'pagetitle' => $row->rc_title,
 				'namespace' => $row->rc_namespace,
 				'username' => $row->rc_user_text,
-				'comment' => $this->fixItemComment( $commentStore->getComment(
-					'rc_comment', $row )->text ),
 				'minor' => $row->rc_minor,
 				'new' => $row->rc_source === RecentChange::SRC_NEW
 			];
@@ -172,116 +147,12 @@ class UserActivity {
 				'pagetitle' => $row->rc_title,
 				'namespace' => $row->rc_namespace,
 				'username' => $row->rc_user_text,
-				'comment' => $this->fixItemComment( $commentStore->getComment(
-					'rc_comment', $row )->text ),
 				'minor' => $row->rc_minor,
 				'new' => $row->rc_source === RecentChange::SRC_NEW
 			];
 		}
 	}
 
-
-	/**
-	 * Get recent comments from the Comments table (provided by the Comments
-	 * extension) and set them in the appropriate class member variables.
-	 */
-	private function setComments() {
-		$dbr = wfGetDB( DB_REPLICA );
-
-		# Bail out if Comments table doesn't exist
-		if ( !$dbr->tableExists( 'Comments' ) ) {
-			return;
-		}
-
-		$where = [];
-		$where[] = 'Comment_Page_ID = page_id';
-
-		if ( !empty( $this->rel_type ) ) {
-			$users = $dbr->select(
-				'user_relationship',
-				'r_actor_relation',
-				[
-					'r_actor' => $this->user->getActorId(),
-					'r_type' => $this->rel_type
-				],
-				__METHOD__
-			);
-			$userArray = [];
-			foreach ( $users as $user ) {
-				$userArray[] = $user;
-			}
-			$userIDs = implode( ',', $userArray );
-			if ( !empty( $userIDs ) ) {
-				$where[] = "Comment_actor IN ($userIDs)";
-			}
-		}
-
-		if ( !empty( $this->show_current_user ) ) {
-			$where['Comment_actor'] = $this->user->getActorId();
-		}
-
-		// @phan-suppress-next-line SecurityCheck-SQLInjection The escaping here is totally proper, phan just can't tell
-		$res = $dbr->select(
-			[ 'Comments', 'page' ],
-			[
-				'Comment_Date AS item_date', 'Comment_actor', 'Comment_IP',
-				'page_title', 'Comment_Text', 'page_namespace', 'CommentID'
-			],
-			$where,
-			__METHOD__,
-			[
-				'ORDER BY' => 'comment_date DESC',
-				'LIMIT' => $this->item_max,
-				'OFFSET' => 0
-			]
-		);
-
-		foreach ( $res as $row ) {
-			$show_comment = true;
-
-			global $wgFilterComments;
-			if ( $wgFilterComments ) {
-				if ( $row->vote_count <= 4 ) {
-					$show_comment = false;
-				}
-			}
-
-			if ( $show_comment ) {
-				$title = Title::makeTitle( $row->page_namespace, $row->page_title );
-				$unixTS = wfTimestamp( TS_UNIX, $row->item_date );
-				$user = User::newFromActorId( $row->Comment_actor );
-				if ( !$user ) {
-					continue;
-				}
-				$this->items_grouped['comment'][$title->getPrefixedText()]['users'][$user->getName()][] = [
-					'id' => $row->CommentID,
-					'type' => 'comment',
-					'timestamp' => $unixTS,
-					'pagetitle' => $row->page_title,
-					'namespace' => $row->page_namespace,
-					'username' => $user->getName(),
-					'comment' => $this->fixItemComment( $row->Comment_Text ),
-					'minor' => 0,
-					'new' => 0
-				];
-
-				// set last timestamp
-				$this->items_grouped['comment'][$title->getPrefixedText()]['timestamp'] = $unixTS;
-
-				$this->items[] = [
-					'id' => $row->CommentID,
-					'type' => 'comment',
-					'timestamp' => $unixTS,
-					'pagetitle' => $row->page_title,
-					'namespace' => $row->page_namespace,
-					'username' => $user->getName(),
-					'comment' => $this->fixItemComment( $row->Comment_Text ),
-					'new' => '0',
-					'minor' => 0
-				];
-			}
-		}
-	}
 
 	/**
 	 * Get recent changes in user relationships from the user_relationship
@@ -446,7 +317,6 @@ class UserActivity {
 				'pagetitle' => '',
 				'namespace' => '',
 				'username' => $from,
-				'comment' => $to,
 				'minor' => 0,
 				'new' => 0
 			];
@@ -461,7 +331,6 @@ class UserActivity {
 				'pagetitle' => '',
 				'namespace' => $this->fixItemComment( $row->ub_message ),
 				'username' => $from,
-				'comment' => $to,
 				'new' => '0',
 				'minor' => 0
 			];
@@ -516,55 +385,10 @@ class UserActivity {
 				'OFFSET' => 0
 			]
 		);
-
-		foreach ( $res as $row ) {
-			$user = User::newFromActorId( $row->um_actor );
-			// @phan-suppress-next-line SecurityCheck-DoubleEscaped T290624
-			$user_name_short = htmlspecialchars( $wgLang->truncateForVisual( $user->getName(), 15 ) );
-			$unixTS = wfTimestamp( TS_UNIX, $row->um_date );
-			$comment = $this->fixItemComment( $row->um_message );
-
-			// @todo FIXME: epic suckage is epic
-			// For level-up actions we do _not_ want escaping because "level-advanced-to" i18n msg
-			// contains <span> tags and we want to parse those correctly...
-			// But why the hell are we even storing an English string or whatever in the
-			// DB in the first place in UserSystemMessage?! That's just horrible.
-			$msg = htmlspecialchars( $row->um_message );
-			if ( $row->um_type == UserSystemMessage::TYPE_LEVELUP ) {
-				$msg = $row->um_message;
-				// Don't call $this->fixItemComment() b/c we don't want to mutilate the
-				// HTML as if we do that, it won't show up properly on social profile pages
-				// Instead just directly truncate the string here if necessary and continue
-				$comment = $wgLang->truncateForVisual( $msg, 75 );
-			}
-
-			$this->activityLines[] = [
-				'type' => 'system_message',
-				'timestamp' => $unixTS,
-				'data' => ' <b><a href="' . htmlspecialchars( $user->getUserPage()->getFullURL() ) . "\">{$user_name_short}</a></b> " . $msg
-			];
-
-			$this->items[] = [
-				'id' => $row->um_id,
-				'type' => 'system_message',
-				'timestamp' => $unixTS,
-				'pagetitle' => '',
-				'namespace' => '',
-				'username' => $user->getName(),
-				'comment' => $comment,
-				'new' => '0',
-				'minor' => 0
-			];
-		}
 	}
 
 	public function getEdits() {
 		$this->setEdits();
-		return $this->items;
-	}
-
-	public function getComments() {
-		$this->setComments();
 		return $this->items;
 	}
 
@@ -587,9 +411,6 @@ class UserActivity {
 		if ( $this->show_edits ) {
 			$this->setEdits();
 		}
-		if ( $this->show_comments ) {
-			$this->setComments();
-		}
 		if ( $this->show_relationships ) {
 			$this->setRelationships();
 		}
@@ -611,9 +432,6 @@ class UserActivity {
 
 		if ( $this->show_edits ) {
 			$this->simplifyPageActivity( 'edit' );
-		}
-		if ( $this->show_comments ) {
-			$this->simplifyPageActivity( 'comment' );
 		}
 		if ( $this->show_relationships ) {
 			$this->simplifyPageActivity( 'friend' );
@@ -676,8 +494,7 @@ class UserActivity {
 					if ( $count_users == 1 && $count_actions > 1 ) {
 						$pages .= wfMessage( 'word-separator' )->escaped();
 						$pages .= wfMessage( 'parentheses' )->rawParams( wfMessage(
-							// For grep: useractivity-group-edit, useractivity-group-comment,
-							// useractivity-group-user_message, useractivity-group-friend
+							// For grep: useractivity-group-edit, // useractivity-group-user_message, useractivity-group-friend
 							"useractivity-group-{$type}",
 							$count_actions,
 							$user_name
@@ -748,11 +565,11 @@ class UserActivity {
 				$safeTitle = htmlspecialchars( $user_title->getText() );
 				$users .= ' <b><a href="' . htmlspecialchars( $user_title->getFullURL() ) . "\" title=\"{$safeTitle}\">{$user_name_short}</a></b>";
 			}
-			if ( $pages || $has_page == false ) {
+			/*if ( $pages || $has_page == false ) {
 				$this->activityLines[] = [
 					'type' => $type,
 					'timestamp' => $page_data['timestamp'],
-					// For grep: useractivity-edit, useractivity-foe, useractivity-friend,
+					// For grep: useractivity-edit, useractivity-friend,
 					// useractivity-gift, useractivity-user_message, useractivity-comment
 					// @phan-suppress-next-line SecurityCheck-XSS Somewhat false alarm as per the comment below
 					'data' => wfMessage( "useractivity-{$type}" )->rawParams(
@@ -762,7 +579,7 @@ class UserActivity {
 						$userNameForGender
 					)->escaped()
 				];
-			}
+			}*/
 		}
 	}
 
@@ -777,14 +594,8 @@ class UserActivity {
 		switch ( $type ) {
 			case 'edit':
 				return 'editIcon.gif';
-			case 'comment':
-				return 'comment.gif';
 			case 'friend':
 				return 'addedFriendIcon.png';
-			case 'system_message':
-				return 'challengeIcon.png';
-			case 'user_message':
-				return 'emailIcon.gif';
 		}
 	}
 

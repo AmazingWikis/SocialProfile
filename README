@@ -1,11 +1,5 @@
 This is the readme file for SocialProfile extension.
 
-==Changes Made==
-* User Welcome, User Gifts were removed
-* Foe Relationship has been removed
-* User Profile and User Activity were gutted
-* Unused assets were deleted
-
 ==Intro==
 SocialProfile extension adds social networking features, such as friending
 and user-to-user messages into your MediaWiki. These are not the only
@@ -19,8 +13,6 @@ https://www.mediawiki.org/wiki/Extension:SocialProfile
 SocialProfile was written by David Pean and Aaron Wright for Wikia, Inc.
 
 It has been maintained by Jack Phoenix since 2008.
-
-Modified by Amazing Wikis Org.
 
 ==License==
 SocialProfile is licensed under GNU General Public License 2.0 or later.
