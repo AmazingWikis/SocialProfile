@@ -45,7 +45,8 @@ class UserHome extends SpecialPage {
 		// Initialize all of these or otherwise we get a lot of E_NOTICEs about
 		// undefined variables when the filtering feature (described below) is
 		// active and we're viewing a filtered-down feed
-		$edits = $relationships = $messages = $system_gifts = $messages_sent = 0;
+		$edits = $votes = $comments = $comments = $gifts = $relationships =
+			$messages = $system_gifts = $messages_sent = $network_updates = 0;
 
 		$rel_type = $request->getVal( 'rel_type' );
 		$item_type = $request->getVal( 'item_type' );
@@ -61,9 +62,6 @@ class UserHome extends SpecialPage {
 		if ( $item_type == 'edits' || $item_type == 'all' ) {
 			$edits = 1;
 		}
-		if ( $item_type == 'relationships' || $item_type == 'all' ) {
-			$relationships = 1;
-		}
 		if ( $item_type == 'messages' || $item_type == 'all' ) {
 			$messages_sent = 1;
 		}
@@ -78,7 +76,7 @@ class UserHome extends SpecialPage {
 		// This would add a link that allows filtering non-board messages
 		// related events from the filter, only showing board message activity
 
-		$filterMsg = $this->msg( 'useractivity-friendsactivity-filter' );
+		/*$filterMsg = $this->msg( 'useractivity-friendsactivity-filter' );
 		if ( !$filterMsg->isDisabled() ) {
 			$output .= '<div class="user-home-links-container">
 			<h2>' . htmlspecialchars( $this->msg( 'useractivity-filter' )->plain() ) . '</h2>
@@ -120,14 +118,15 @@ class UserHome extends SpecialPage {
 			);
 			$output .= '</div>
 			</div>';
-		}
+		}*/
 
-		$output .= '<div class="user-home-feed">';
+		//$output .= '<div class="user-home-feed">';
 
 		$rel = new UserActivity( $user, ( ( $rel_type == 1 ) ? ' friends' : 'foes' ), 50 );
 		$rel->setActivityToggle( 'show_edits', $edits );
-		$rel->setActivityToggle( 'show_relationships', $relationships );
-		$rel->setActivityToggle( 'show_system_messages', $messages );
+		//$rel->setActivityToggle( 'show_comments', $comments );
+		//$rel->setActivityToggle( 'show_relationships', $relationships );
+		//$rel->setActivityToggle( 'show_system_messages', $messages );
 		$rel->setActivityToggle( 'show_messages_sent', $messages_sent );
 
 		/**

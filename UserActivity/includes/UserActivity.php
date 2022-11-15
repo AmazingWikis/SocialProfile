@@ -20,10 +20,6 @@ class UserActivity {
 	/** @var int */
 	private $show_edits = 1;
 	/** @var int */
-	private $show_relationships = 1;
-	/** @var int */
-	private $show_system_messages = 1;
-	/** @var int */
 	private $show_messages_sent = 1;
 	/** @var bool */
 	private $show_all;
@@ -112,8 +108,29 @@ class UserActivity {
 		if ( !empty( $this->show_current_user ) ) {
 			$where['actor_id'] = $this->user->getActorId();
 		}
-
 		$actorQuery = ActorMigration::newMigration()->getJoin( 'rc_user' ); // @todo This usage is deprecated since MW 1.34.
+
+		$commentStore = CommentStore::getStore();
+		$commentQuery = $commentStore->getJoin( 'rc_comment' );
+
+		// @phan-suppress-next-line SecurityCheck-SQLInjection The escaping here is totally proper, phan just can't tell
+		$res = $dbr->select(
+			[ 'recentchanges' ] + $commentQuery['tables'] + $actorQuery['tables'],
+			[
+				'rc_timestamp', 'rc_title',
+				'rc_id', 'rc_minor',
+				'rc_source', 'rc_namespace', 'rc_cur_id', 'rc_this_oldid',
+				'rc_last_oldid', 'rc_log_action'
+			] + $commentQuery['fields'] + $actorQuery['fields'],
+			$where,
+			__METHOD__,
+			[
+				'ORDER BY' => 'rc_id DESC',
+				'LIMIT' => $this->item_max,
+				'OFFSET' => 0
+			],
+			$commentQuery['joins'] + $actorQuery['joins']
+		);
 
 		foreach ( $res as $row ) {
 			// Special pages aren't editable, so ignore them
@@ -133,6 +150,8 @@ class UserActivity {
 				'pagetitle' => $row->rc_title,
 				'namespace' => $row->rc_namespace,
 				'username' => $row->rc_user_text,
+				'comment' => $this->fixItemComment( $commentStore->getComment(
+					'rc_comment', $row )->text ),
 				'minor' => $row->rc_minor,
 				'new' => $row->rc_source === RecentChange::SRC_NEW
 			];
@@ -147,106 +166,10 @@ class UserActivity {
 				'pagetitle' => $row->rc_title,
 				'namespace' => $row->rc_namespace,
 				'username' => $row->rc_user_text,
+				'comment' => $this->fixItemComment( $commentStore->getComment(
+					'rc_comment', $row )->text ),
 				'minor' => $row->rc_minor,
 				'new' => $row->rc_source === RecentChange::SRC_NEW
-			];
-		}
-	}
-
-
-	/**
-	 * Get recent changes in user relationships from the user_relationship
-	 * table and set them in the appropriate class member variables.
-	 */
-	private function setRelationships() {
-		global $wgLang;
-
-		$dbr = wfGetDB( DB_REPLICA );
-
-		$where = [];
-
-		if ( !empty( $this->rel_type ) ) {
-			$users = $dbr->select(
-				'user_relationship',
-				'r_actor_relation',
-				[
-					'r_actor' => $this->user->getActorId(),
-					'r_type' => $this->rel_type
-				],
-				__METHOD__
-			);
-			$userArray = [];
-			foreach ( $users as $user ) {
-				$userArray[] = $user;
-			}
-			$actorIDs = implode( ',', $userArray );
-			if ( !empty( $actorIDs ) ) {
-				$where[] = "r_actor IN ($actorIDs)";
-			}
-		}
-
-		if ( !empty( $this->show_current_user ) ) {
-			$where['r_actor'] = $this->user->getActorId();
-		}
-
-		// @phan-suppress-next-line SecurityCheck-SQLInjection The escaping here is totally proper, phan just can't tell
-		$res = $dbr->select(
-			'user_relationship',
-			[ 'r_id', 'r_actor', 'r_actor_relation', 'r_type', 'r_date' ],
-			$where,
-			__METHOD__,
-			[
-				'ORDER BY' => 'r_id DESC',
-				'LIMIT' => $this->item_max,
-				'OFFSET' => 0
-			]
-		);
-
-		foreach ( $res as $row ) {
-			if ( $row->r_type == 1 ) {
-				$r_type = 'friend';
-			} else {
-				$r_type = 'foe';
-			}
-
-			$user = User::newFromActorId( $row->r_actor );
-			if ( !$user ) {
-				continue;
-			}
-
-			$userRelation = User::newFromActorId( $row->r_actor_relation );
-			if ( !$userRelation ) {
-				continue;
-			}
-
-			$user_name_short = $wgLang->truncateForVisual( $user->getName(), 25 );
-			$unixTS = wfTimestamp( TS_UNIX, $row->r_date );
-
-			$this->items_grouped[$r_type][$userRelation->getName()]['users'][$user->getName()][] = [
-				'id' => $row->r_id,
-				'type' => $r_type,
-				'timestamp' => $unixTS,
-				'pagetitle' => '',
-				'namespace' => '',
-				'username' => $user_name_short,
-				'comment' => $user->getName(),
-				'minor' => 0,
-				'new' => 0
-			];
-
-			// set last timestamp
-			$this->items_grouped[$r_type][$userRelation->getName()]['timestamp'] = $unixTS;
-
-			$this->items[] = [
-				'id' => $row->r_id,
-				'type' => $r_type,
-				'timestamp' => $unixTS,
-				'pagetitle' => '',
-				'namespace' => '',
-				'username' => $user->getName(),
-				'comment' => $userRelation->getName(),
-				'new' => '0',
-				'minor' => 0
 			];
 		}
 	}
@@ -317,6 +240,7 @@ class UserActivity {
 				'pagetitle' => '',
 				'namespace' => '',
 				'username' => $from,
+				'comment' => $to,
 				'minor' => 0,
 				'new' => 0
 			];
@@ -331,74 +255,15 @@ class UserActivity {
 				'pagetitle' => '',
 				'namespace' => $this->fixItemComment( $row->ub_message ),
 				'username' => $from,
+				'comment' => $to,
 				'new' => '0',
 				'minor' => 0
 			];
 		}
 	}
 
-	/**
-	 * Get recent system messages (i.e. "User Foo advanced to level Bar") from
-	 * the user_system_messages table and set them in the appropriate class
-	 * member variables.
-	 */
-	private function setSystemMessages() {
-		global $wgLang;
-
-		$dbr = wfGetDB( DB_REPLICA );
-
-		$where = [];
-
-		if ( !empty( $this->rel_type ) ) {
-			$users = $dbr->select(
-				'user_relationship',
-				'r_actor_relation',
-				[
-					'r_actor' => $this->user->getActorId(),
-					'r_type' => $this->rel_type
-				],
-				__METHOD__
-			);
-			$userArray = [];
-			foreach ( $users as $user ) {
-				$userArray[] = $user;
-			}
-			$actorIDs = implode( ',', $userArray );
-			if ( !empty( $actorIDs ) ) {
-				$where[] = "um_actor IN ($actorIDs)";
-			}
-		}
-
-		if ( !empty( $this->show_current_user ) ) {
-			$where['um_actor'] = $this->user->getActorId();
-		}
-
-		// @phan-suppress-next-line SecurityCheck-SQLInjection The escaping here is totally proper, phan just can't tell
-		$res = $dbr->select(
-			'user_system_messages',
-			[ 'um_id', 'um_actor', 'um_type', 'um_message', 'um_date' ],
-			$where,
-			__METHOD__,
-			[
-				'ORDER BY' => 'um_id DESC',
-				'LIMIT' => $this->item_max,
-				'OFFSET' => 0
-			]
-		);
-	}
-
 	public function getEdits() {
 		$this->setEdits();
-		return $this->items;
-	}
-
-	public function getRelationships() {
-		$this->setRelationships();
-		return $this->items;
-	}
-
-	public function getSystemMessages() {
-		$this->setSystemMessages();
 		return $this->items;
 	}
 
@@ -410,12 +275,6 @@ class UserActivity {
 	public function getActivityList() {
 		if ( $this->show_edits ) {
 			$this->setEdits();
-		}
-		if ( $this->show_relationships ) {
-			$this->setRelationships();
-		}
-		if ( $this->show_system_messages ) {
-			$this->getSystemMessages();
 		}
 		if ( $this->show_messages_sent ) {
 			$this->getMessagesSent();
@@ -433,9 +292,6 @@ class UserActivity {
 		if ( $this->show_edits ) {
 			$this->simplifyPageActivity( 'edit' );
 		}
-		if ( $this->show_relationships ) {
-			$this->simplifyPageActivity( 'friend' );
-		}
 		if ( $this->show_messages_sent ) {
 			$this->simplifyPageActivity( 'user_message' );
 		}
@@ -452,7 +308,7 @@ class UserActivity {
 	}
 
 	/**
-	 * @param string $type Activity type, such as 'friend' or 'foe' or 'edit'
+	 * @param string $type Activity type, such as 'edit'
 	 * @param bool $has_page True by default
 	 */
 	function simplifyPageActivity( $type, $has_page = true ) {
@@ -466,7 +322,7 @@ class UserActivity {
 			$users = '';
 			$pages = '';
 
-			if ( $type == 'friend' || $type == 'user_message' ) {
+			if ( $type == 'user_message' ) {
 				$page_title = Title::newFromText( $page_name, NS_USER );
 			} else {
 				$page_title = Title::newFromText( $page_name );
@@ -494,7 +350,8 @@ class UserActivity {
 					if ( $count_users == 1 && $count_actions > 1 ) {
 						$pages .= wfMessage( 'word-separator' )->escaped();
 						$pages .= wfMessage( 'parentheses' )->rawParams( wfMessage(
-							// For grep: useractivity-group-edit, // useractivity-group-user_message, useractivity-group-friend
+							// For grep: useractivity-group-edit, 
+							// useractivity-group-user_message, 
 							"useractivity-group-{$type}",
 							$count_actions,
 							$user_name
@@ -516,7 +373,6 @@ class UserActivity {
 									$count_actions2 = count( $action2 );
 
 									if (
-										$type == 'friend' ||
 										$type == 'user_message'
 									) {
 										$page_title2 = Title::newFromText( $page_name2, NS_USER );
@@ -533,9 +389,8 @@ class UserActivity {
 									if ( $count_actions2 > 1 ) {
 										$pages .= wfMessage( 'word-separator' )->escaped();
 										$pages .= wfMessage( 'parentheses' )->rawParams( wfMessage(
-											// For grep: useractivity-group-edit, useractivity-group-comment,
-											// useractivity-group-user_message, useractivity-group-friend
-											"useractivity-group-{$type}",
+											// For grep: useractivity-group-edit,
+											// useractivity-group-user_message											"useractivity-group-{$type}",
 											$count_actions2,
 											$user_name
 										)->escaped() )->escaped();
@@ -565,11 +420,11 @@ class UserActivity {
 				$safeTitle = htmlspecialchars( $user_title->getText() );
 				$users .= ' <b><a href="' . htmlspecialchars( $user_title->getFullURL() ) . "\" title=\"{$safeTitle}\">{$user_name_short}</a></b>";
 			}
-			/*if ( $pages || $has_page == false ) {
+			if ( $pages || $has_page == false ) {
 				$this->activityLines[] = [
 					'type' => $type,
 					'timestamp' => $page_data['timestamp'],
-					// For grep: useractivity-edit, useractivity-friend,
+					// For grep: useractivity-edit, useractivity-foe, useractivity-friend,
 					// useractivity-gift, useractivity-user_message, useractivity-comment
 					// @phan-suppress-next-line SecurityCheck-XSS Somewhat false alarm as per the comment below
 					'data' => wfMessage( "useractivity-{$type}" )->rawParams(
@@ -579,7 +434,7 @@ class UserActivity {
 						$userNameForGender
 					)->escaped()
 				];
-			}*/
+			}
 		}
 	}
 
@@ -594,8 +449,14 @@ class UserActivity {
 		switch ( $type ) {
 			case 'edit':
 				return 'editIcon.gif';
+			case 'comment':
+				return 'comment.gif';
 			case 'friend':
 				return 'addedFriendIcon.png';
+			case 'system_message':
+				return 'challengeIcon.png';
+			case 'user_message':
+				return 'emailIcon.gif';
 		}
 	}
 
