@@ -25,7 +25,6 @@ class ApiUserProfileType extends ApiBase {
 		// Only allow changing your own user page type for the time being...
 		$user = $this->getUser();
 		if ( $user->isAnon() ) {
-			// Boo, go away!
 			$this->dieWithError( 'apierror-mustbeloggedin-generic', 'login-required' );
 		}
 
