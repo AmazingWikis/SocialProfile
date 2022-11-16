@@ -49,14 +49,14 @@ class SocialProfileHooks {
 		$updater->addExtensionTable( 'user_board', "$dir/UserBoard/sql/user_board$dbExt.sql" );
 		$updater->addExtensionTable( 'user_fields_privacy', "$dir/UserProfile/sql/user_fields_privacy$dbExt.sql" );
 		$updater->addExtensionTable( 'user_profile', "$dir/UserProfile/sql/user_profile$dbExt.sql" );
-		$updater->addExtensionTable( 'user_stats', "$dir/UserStats/sql/user_stats$dbExt.sql" );
-		$updater->addExtensionTable( 'user_system_messages', "$dir/UserStats/sql/user_system_messages$dbExt.sql" );
-		$updater->addExtensionTable( 'user_relationship', "$dir/UserRelationship/sql/user_relationship$dbExt.sql" );
-		$updater->addExtensionTable( 'user_relationship_request', "$dir/UserRelationship/sql/user_relationship_request$dbExt.sql" );
-		$updater->addExtensionTable( 'user_system_gift', "$dir/SystemGifts/sql/user_system_gift$dbExt.sql" );
-		$updater->addExtensionTable( 'system_gift', "$dir/SystemGifts/sql/system_gift$dbExt.sql" );
-		$updater->dropExtensionField( 'user_stats', 'stats_year_id', "$dir/UserStats/sql/patches/patch-drop-column-stats_year_id.sql" );
 		$updater->dropExtensionField( 'user_profile', 'up_last_seen', "$dir/UserProfile/sql/patches/patch-drop-column-up_last_seen.sql" );
+		//$updater->addExtensionTable( 'user_relationship', "$dir/UserRelationship/sql/user_relationship$dbExt.sql" );
+		//$updater->addExtensionTable( 'user_relationship_request', "$dir/UserRelationship/sql/user_relationship_request$dbExt.sql" );
+		//$updater->addExtensionTable( 'user_system_gift', "$dir/SystemGifts/sql/user_system_gift$dbExt.sql" );
+		//$updater->addExtensionTable( 'system_gift', "$dir/SystemGifts/sql/system_gift$dbExt.sql" );
+		//$updater->addExtensionTable( 'user_stats', "$dir/UserStats/sql/user_stats$dbExt.sql" );
+		//$updater->dropExtensionField( 'user_stats', 'stats_year_id', "$dir/UserStats/sql/patches/patch-drop-column-stats_year_id.sql" );
+		//$updater->addExtensionTable( 'user_system_messages', "$dir/UserStats/sql/user_system_messages$dbExt.sql" );
 
 		// Actor support
 
@@ -118,7 +118,7 @@ class SocialProfileHooks {
 		}
 
 		# UserRelationship -- two affected tables, user_relationship & user_relationship_request
-		if ( !$db->fieldExists( 'user_relationship', 'r_actor', __METHOD__ ) ) {
+		/*if ( !$db->fieldExists( 'user_relationship', 'r_actor', __METHOD__ ) ) {
 			// 1) add new actor column
 			$updater->addExtensionField( 'user_relationship', 'r_actor', "$dir/UserRelationship/sql/patches/actor/add-r_actor$dbExt.sql" );
 			$updater->addExtensionField( 'user_relationship', 'r_actor_relation', "$dir/UserRelationship/sql/patches/actor/add-r_actor_relation$dbExt.sql" );
@@ -138,9 +138,9 @@ class SocialProfileHooks {
 			$updater->dropExtensionField( 'user_relationship', 'r_user_name_relation', "$dir/UserRelationship/sql/patches/actor/drop-r_user_name_relation.sql" );
 			$updater->dropExtensionIndex( 'user_relationship', 'r_user_id', "$dir/UserRelationship/sql/patches/actor/drop-r_user_id_index.sql" );
 			$updater->dropExtensionIndex( 'user_relationship', 'r_user_id_relation', "$dir/UserRelationship/sql/patches/actor/drop-r_user_id_relation_index.sql" );
-		}
+		}*/
 
-		if ( !$db->fieldExists( 'user_relationship_request', 'ur_actor_from', __METHOD__ ) ) {
+		/*if ( !$db->fieldExists( 'user_relationship_request', 'ur_actor_from', __METHOD__ ) ) {
 			// 1) add new actor column
 			$updater->addExtensionField( 'user_relationship_request', 'ur_actor_from', "$dir/UserRelationship/sql/patches/actor/add-ur_actor_from$dbExt.sql" );
 			$updater->addExtensionField( 'user_relationship_request', 'ur_actor_to', "$dir/UserRelationship/sql/patches/actor/add-ur_actor_to$dbExt.sql" );
@@ -160,10 +160,10 @@ class SocialProfileHooks {
 			$updater->dropExtensionField( 'user_relationship_request', 'ur_user_name_to', "$dir/UserRelationship/sql/patches/actor/drop-ur_user_name_to.sql" );
 			$updater->dropExtensionIndex( 'user_relationship_request', 'ur_user_id_from', "$dir/UserRelationship/sql/patches/actor/drop-ur_user_id_from_index.sql" );
 			$updater->dropExtensionIndex( 'user_relationship_request', 'ur_user_id_to', "$dir/UserRelationship/sql/patches/actor/drop-ur_user_id_to_index.sql" );
-		}
+		}*/
 
 		# UserStats -- 5 tables: user_points_{archive,monthly,weekly}, user_stats, user_system_messages
-		if ( !$db->fieldExists( 'user_stats', 'stats_actor', __METHOD__ ) ) {
+		/*if ( !$db->fieldExists( 'user_stats', 'stats_actor', __METHOD__ ) ) {
 			// 1) add new actor column
 			$updater->addExtensionField( 'user_stats', 'stats_actor', "$dir/UserStats/sql/patches/actor/add-stats_actor.sql" );
 			// the stats_id column adding is done by the script, it can't be done here
@@ -177,9 +177,9 @@ class SocialProfileHooks {
 			// 3) drop old columns
 			$updater->dropExtensionField( 'user_stats', 'stats_user_name', "$dir/UserStats/sql/patches/actor/drop-stats_user_name.sql" );
 			$updater->dropExtensionField( 'user_stats', 'stats_user_id', "$dir/UserStats/sql/patches/actor/drop-stats_user_id.sql" );
-		}
+		}*/
 
-		if ( !$db->fieldExists( 'user_system_messages', 'um_actor', __METHOD__ ) ) {
+		/*if ( !$db->fieldExists( 'user_system_messages', 'um_actor', __METHOD__ ) ) {
 			// 1) add new actor column
 			$updater->addExtensionField( 'user_system_messages', 'um_actor', "$dir/UserStats/sql/patches/actor/add-um_actor$dbExt.sql" );
 			// 2) add the corresponding index
@@ -195,7 +195,7 @@ class SocialProfileHooks {
 			$updater->dropExtensionField( 'user_system_messages', 'um_user_id', "$dir/UserStats/sql/patches/actor/drop-um_user_id.sql" );
 			// [sic]!
 			$updater->dropExtensionIndex( 'user_system_messages', 'up_user_id', "$dir/UserStats/sql/patches/actor/drop-index-up_user_id-on-user_system_messages.sql" );
-		}
+		}*/
 
 	}
 

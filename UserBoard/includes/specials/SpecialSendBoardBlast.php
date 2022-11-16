@@ -130,11 +130,6 @@ class SpecialBoardBlast extends UnlistedSpecialPage {
 	function displayForm() {
 		$user = $this->getUser();
 
-		$stats = new UserStats( $user->getId(), $user->getName() );
-		$stats_data = $stats->getUserStats();
-		$friendCount = $stats_data['friend_count'];
-		$foeCount = $stats_data['foe_count'];
-
 		$output = '<div class="board-blast-message-form">
 				<h2>' . $this->msg( 'boardblaststep1' )->escaped() . '</h2>
 				<form method="post" name="blast" action="">
@@ -169,7 +164,7 @@ class SpecialBoardBlast extends UnlistedSpecialPage {
 		$output .= '</div>
 		</div>';
 
-		$listLookup = new RelationshipListLookup( $user );
+		/*$listLookup = new RelationshipListLookup( $user );
 		$relationships = $listLookup->getRelationshipList();
 
 		$output .= '<div id="blast-friends-list" class="blast-friends-list">';
@@ -203,7 +198,7 @@ class SpecialBoardBlast extends UnlistedSpecialPage {
 
 		$output .= '</div>
 
-			<div class="visualClear"></div>';
+			<div class="visualClear"></div>';*/
 
 		$output .= '<div class="blast-message-box-button">
 				<input type="submit" value="' . $this->msg( 'boardsendbutton' )->escaped() . '" class="site-button" />

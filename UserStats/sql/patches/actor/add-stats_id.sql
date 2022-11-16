@@ -1,1 +1,0 @@
-ALTER TABLE /*_*/user_stats ADD COLUMN stats_id int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT FIRST;

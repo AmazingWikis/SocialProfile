@@ -66,18 +66,6 @@ class UserBoard {
 			$messageCount->clear();
 		}
 
-		$stats = new UserStatsTrack( $recipient->getId(), $recipient->getName() );
-		if ( $message_type == 0 ) {
-			// public message count
-			$stats->incStatField( 'user_board_count' );
-		} else {
-			// private message count
-			$stats->incStatField( 'user_board_count_priv' );
-		}
-
-		$stats = new UserStatsTrack( $sender->getId(), $sender->getName() );
-		$stats->incStatField( 'user_board_sent' );
-
 		if ( ExtensionRegistry::getInstance()->isLoaded( 'Echo' ) ) {
 			EchoEvent::create( [
 				'type' => 'social-msg-send',
@@ -204,12 +192,12 @@ class UserBoard {
 				);
 
 				$user = User::newFromActorId( $s->ub_actor );
-				$stats = new UserStatsTrack( $user->getId(), $user->getName() );
+				/*$stats = new UserStatsTrack( $user->getId(), $user->getName() );
 				if ( $s->ub_type == 0 ) {
 					$stats->decStatField( 'user_board_count' );
 				} else {
 					$stats->decStatField( 'user_board_count_priv' );
-				}
+				}*/
 			}
 		}
 	}

@@ -1,1 +1,0 @@
-CREATE INDEX /*i*/upa_actor ON /*_*/user_points_archive (up_actor);

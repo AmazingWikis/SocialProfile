@@ -1,1 +1,0 @@
-ALTER TABLE user_relationship_request ADD COLUMN ur_actor_to INTEGER NOT NULL;

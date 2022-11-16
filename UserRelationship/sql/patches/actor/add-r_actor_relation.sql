@@ -1,1 +1,0 @@
-ALTER TABLE /*_*/user_relationship ADD COLUMN r_actor_relation bigint unsigned NOT NULL AFTER r_actor;

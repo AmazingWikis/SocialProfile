@@ -36,11 +36,8 @@ $wgExtensionMessagesFiles['AvatarMagic'] = __DIR__ . '/UserProfile/includes/avat
 // Based on Installer::includeExtensions()
 if ( defined( 'MEDIAWIKI_INSTALL' ) ) {
 	$subext = [
-		__DIR__ . '/SystemGifts/extension.json' => 1,
 		__DIR__ . '/UserActivity/extension.json' => 1,
 		__DIR__ . '/UserBoard/extension.json' => 1,
-		__DIR__ . '/UserRelationship/extension.json' => 1,
-		__DIR__ . '/UserStats/extension.json' => 1,
 	];
 
 	$registry = new ExtensionRegistry();
@@ -90,14 +87,10 @@ $wgSpecialPages['UploadAvatar'] = 'SpecialUploadAvatar';
 
 // What to display on social profile pages by default?
 $wgUserProfileDisplay['board'] = true;
-$wgUserProfileDisplay['friends'] = true;
 $wgUserProfileDisplay['avatar'] = true; // If set to false, disables both avatar display and upload
 
 // Should we display UserBoard-related things on social profile pages?
 $wgUserBoard = true;
-
-// Whether to enable friending or not -- this doesn't do very much actually, so don't rely on it
-$wgFriendingEnabled = true;
 
 // Prefix SocialProfile will use to store avatars
 // for global avatars on a wikifarm or groups of wikis,
@@ -120,11 +113,8 @@ $wgAutoloadClasses['SocialProfileHooks'] = __DIR__ . '/SocialProfileHooks.php';
 // Loader files
 require_once __DIR__ . '/UserProfile/UserProfile.php'; // Profile page configuration loader file
 wfLoadExtensions( [
-	'SocialProfile/SystemGifts', // SystemGifts (friend system)
 	'SocialProfile/UserActivity', // UserActivity - recent social changes
 	'SocialProfile/UserBoard',
-	'SocialProfile/UserRelationship',
-	'SocialProfile/UserStats',
 
 ] );
 

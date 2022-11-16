@@ -520,12 +520,12 @@ class UserProfilePage extends Article {
 		$user_social_profile = Title::makeTitle( NS_USER_PROFILE, $this->profileOwner->getName() );
 		$user_wiki = Title::makeTitle( NS_USER_WIKI, $this->profileOwner->getName() );
 
-		if ( !$this->profileOwner->isAnon() ) {
+		/*if ( !$this->profileOwner->isAnon() ) {
 			$relationship = UserRelationship::getUserRelationshipByID(
 				$this->profileOwner,
 				$this->viewingUser
 			);
-		}
+		}*/
 		$avatar = new wAvatar( $this->profileOwner->getId(), 'l' );
 
 		$logger = LoggerFactory::getInstance( 'SocialProfile' );

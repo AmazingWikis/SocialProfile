@@ -149,9 +149,6 @@ class SpecialViewUserBoard extends SpecialPage {
 		);
 
 		if ( !$user_2 ) {
-			$stats = new UserStats( $user_id, $user_name );
-			$stats_data = $stats->getUserStats();
-			$total = $stats_data['user_board'];
 			// If user is viewing their own board or is allowed to delete
 			// others' board messages, show the total count of board messages
 			// to them (public + private messages)
@@ -159,7 +156,7 @@ class SpecialViewUserBoard extends SpecialPage {
 				$currentUser->getName() == $user_name ||
 				$currentUser->isAllowed( 'userboard-delete' )
 			) {
-				$total = $total + $stats_data['user_board_priv'];
+				$total = $total;
 			}
 		} else {
 			$total = $b->getUserBoardToBoardCount( ( $userFromURL ? User::newFromName( $userFromURL ) : $currentUser ), $user_2 );
