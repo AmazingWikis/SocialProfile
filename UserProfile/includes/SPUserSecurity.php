@@ -189,6 +189,33 @@ class SPUserSecurity {
 
 			case 'hidden':
 				return false;
+
+			case 'friends':
+				if ( $relation == 1 ) {
+					return true;
+				}
+				break;
+
+			case 'foaf':
+				if ( $relation == 1 ) {
+					return true;
+				}
+
+				// Now we know that the viewer is not the user's friend, but we
+				// must check if the viewer has friends that are the owner's friends:
+				$listLookup = new RelationshipListLookup( $owner );
+				$ownerFriends = $listLookup->getFriendList();
+
+				foreach ( $ownerFriends as $friend ) {
+					// If someone in the owner's friends has the viewer in their
+					// friends, the test is passed
+					$friendActor = User::newFromActorId( $friend['actor'] );
+					if ( UserRelationship::getUserRelationshipByID( $friendActor, $viewer ) == 1 ) {
+						return true;
+					}
+				}
+
+				break;
 		}
 
 		return false;

@@ -48,11 +48,13 @@ $wgUserProfileThresholds = [
 // Default setup for displaying sections
 $wgUserPageChoice = true;
 
+$wgUserProfileDisplay['friends'] = true;
 $wgUserProfileDisplay['board'] = true;
 $wgUserProfileDisplay['activity'] = true; // Display recent social activity?
 $wgUserProfileDisplay['profile'] = true;
-$wgUserProfileDisplay['interests'] = true;
 $wgUserProfileDisplay['personal'] = true;
+$wgUserProfileDisplay['interests'] = true;
+
 
 $wgUpdateProfileInRecentChanges = false; // Show a log entry in recent changes whenever a user updates their profile?
 $wgUploadAvatarInRecentChanges = false; // Same as above, but for avatar uploading
