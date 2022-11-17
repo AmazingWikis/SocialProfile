@@ -48,7 +48,7 @@ class UserProfile {
 		'about',
 		'places_lived',
 		'websites',
-		'occupation',
+		'hobby',
 		'schools',
 		'movies',
 		'tv',
@@ -58,10 +58,10 @@ class UserProfile {
 		'video_games',
 		'snacks',
 		'drinks',
-		//'custom_1',
-		//'custom_2',
-		//'custom_3',
-		//'custom_4',
+		'custom_1',
+		'custom_2',
+		'custom_3',
+		'custom_4',
 		'email'
 	];
 
@@ -161,7 +161,7 @@ class UserProfile {
 			$profile['places_lived'] = $row->up_places_lived ?? '';
 			$profile['websites'] = $row->up_websites ?? '';
 			$profile['relationship'] = $row->up_relationship ?? '';
-			$profile['occupation'] = $row->up_occupation ?? '';
+			$profile['hobby'] = $row->up_hobby?? '';
 			$profile['schools'] = $row->up_schools ?? '';
 			$profile['movies'] = $row->up_movies ?? '';
 			$profile['music'] = $row->up_music ?? '';

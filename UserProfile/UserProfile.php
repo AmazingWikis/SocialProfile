@@ -27,28 +27,12 @@ $wgUserProfileThresholds = [
 /**
  * All currently "supported" options (supported meaning that there is i18n support):
  * edits // normal edits in the namespaces that earn you points ($wgNamespacesForEditPoints)
- * votes // [[mw:Extension:VoteNY]] votes
- * comments // [[mw:Extension:Comments]] comments
- * comment-score-plus // [[mw:Extension:Comments]] upvoted comments
- * comment-score-minus // [[mw:Extension:Comments]] downvoted comments
- * recruits // recruits; see [[mw:Extension:NewSignupPage]]
- * friend-count // friends
- * foe-count // foes
- * weekly-wins // @see /UserStats/GenerateTopUsersReport.php
- * monthly-wins // @see /UserStats/GenerateTopUsersReport.php
- * poll-votes // [[mw:Extension:PollNY]] votes
- * picture-game-votes // [[mw:Extension:PictureGame]] votes
- * quiz-created // [[mw:Extension:QuizGame]] created quizzes
- * quiz-answered // [[mw:Extension:QuizGame]] answered quizzes in total
- * quiz-correct // [[mw:Extension:QuizGame]] correctly answered quizzes
- * quiz-points // [[mw:Extension:QuizGame]] points in total
  */
 ];
 
 // Default setup for displaying sections
 $wgUserPageChoice = true;
 
-$wgUserProfileDisplay['friends'] = true;
 $wgUserProfileDisplay['board'] = true;
 $wgUserProfileDisplay['activity'] = true; // Display recent social activity?
 $wgUserProfileDisplay['profile'] = true;

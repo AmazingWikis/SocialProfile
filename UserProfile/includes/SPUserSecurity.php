@@ -180,7 +180,7 @@ class SPUserSecurity {
 			return true;
 		}
 
-		//$relation = UserRelationship::getUserRelationshipByID( $viewer, $owner ); // 1 = friend, 2 = foe
+		$relation = UserRelationship::getUserRelationshipByID( $viewer, $owner ); // 1 = friend, 2 = foe
 		$privacy = self::getPrivacy( $owner, $fieldKey );
 
 		switch ( $privacy ) {

@@ -7,7 +7,7 @@
  * @file
  * @ingroup Extensions
  * @author David Pean <david.pean@gmail.com>
- * @copyright Copyright Â© 2007, Wikia Inc.
+ * @copyright Copyright © 2007, Wikia Inc.
  * @license GPL-2.0-or-later
  */
 
