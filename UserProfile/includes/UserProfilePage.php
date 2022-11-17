@@ -264,45 +264,6 @@ class UserProfilePage extends Article {
 			$location = '';
 		}
 
-		// Hometown
-		$hometown = $profile_data['hometown_city'] . ', ' . $profile_data['hometown_state'];
-		if ( $profile_data['hometown_country'] != $defaultCountry ) {
-			if ( $profile_data['hometown_city'] && $profile_data['hometown_state'] ) { // city AND state
-				$hometown = $profile_data['hometown_city'] . ', ' .
-							$profile_data['hometown_state'] . ', ' .
-							$profile_data['hometown_country'];
-				$hometown = '';
-				if ( in_array( 'up_hometown_city', $this->profile_visible_fields ) ) {
-					$hometown .= $profile_data['hometown_city'] . ', ' . $profile_data['hometown_state'];
-				}
-				if ( in_array( 'up_hometown_country', $this->profile_visible_fields ) ) {
-					$hometown .= ', ' . $profile_data['hometown_country'];
-				}
-			} elseif ( $profile_data['hometown_city'] && !$profile_data['hometown_state'] ) { // city, but no state
-				$hometown = '';
-				if ( in_array( 'up_hometown_city', $this->profile_visible_fields ) ) {
-					$hometown .= $profile_data['hometown_city'] . ', ';
-				}
-				if ( in_array( 'up_hometown_country', $this->profile_visible_fields ) ) {
-					$hometown .= $profile_data['hometown_country'];
-				}
-			} elseif ( $profile_data['hometown_state'] && !$profile_data['hometown_city'] ) { // state, but no city
-				$hometown = $profile_data['hometown_state'];
-				if ( in_array( 'up_hometown_country', $this->profile_visible_fields ) ) {
-					$hometown .= ', ' . $profile_data['hometown_country'];
-				}
-			} else {
-				$hometown = '';
-				if ( in_array( 'up_hometown_country', $this->profile_visible_fields ) ) {
-					$hometown .= $profile_data['hometown_country'];
-				}
-			}
-		}
-
-		if ( $hometown == ', ' ) {
-			$hometown = '';
-		}
-
 		$joined_data = $profile_data['real_name'] . $location . $hometown .
 						$profile_data['birthday'] . $profile_data['occupation'] .
 						$profile_data['websites'] . $profile_data['places_lived'] .
@@ -316,7 +277,6 @@ class UserProfilePage extends Article {
 		}
 
 		$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-location' )->escaped(), $location, false );
-		$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-hometown' )->escaped(), $hometown, false );
 
 		if ( in_array( 'up_birthday', $this->profile_visible_fields ) ) {
 			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-birthday' )->escaped(), $profile_data['birthday'], false );
@@ -385,82 +345,6 @@ class UserProfilePage extends Article {
 		return $output;
 	}
 
-	/**
-	 * Get the custom info (site-specific stuff) for a given user.
-	 *
-	 * @return string HTML
-	 */
-	function getCustomInfo() {
-		global $wgUserProfileDisplay;
-
-		if ( $wgUserProfileDisplay['custom'] == false ) {
-			return '';
-		}
-
-		$this->initializeProfileData();
-
-		$profile_data = $this->profile_data;
-
-		$joined_data = $profile_data['custom_1'] . $profile_data['custom_2'] .
-						$profile_data['custom_3'] . $profile_data['custom_4'];
-		$edit_info_link = SpecialPage::getTitleFor( 'UpdateProfile' );
-
-		$custom_output = '';
-		if ( in_array( 'up_custom_1', $this->profile_visible_fields ) ) {
-			$custom_output .= $this->getProfileSection( wfMessage( 'custom-info-field1' )->escaped(), $profile_data['custom_1'], false );
-		}
-		if ( in_array( 'up_custom_2', $this->profile_visible_fields ) ) {
-			$custom_output .= $this->getProfileSection( wfMessage( 'custom-info-field2' )->escaped(), $profile_data['custom_2'], false );
-		}
-		if ( in_array( 'up_custom_3', $this->profile_visible_fields ) ) {
-			$custom_output .= $this->getProfileSection( wfMessage( 'custom-info-field3' )->escaped(), $profile_data['custom_3'], false );
-		}
-		if ( in_array( 'up_custom_4', $this->profile_visible_fields ) ) {
-			$custom_output .= $this->getProfileSection( wfMessage( 'custom-info-field4' )->escaped(), $profile_data['custom_4'], false );
-		}
-
-		$output = '';
-		if ( $joined_data ) {
-			$output .= '<div class="user-section-heading">
-				<div class="user-section-title">' .
-					wfMessage( 'custom-info-title' )->escaped() .
-				'</div>
-				<div class="user-section-actions">
-					<div class="action-right">';
-			if ( $this->viewingUser->getName() == $this->profileOwner->getName() ) {
-				$output .= '<a href="' . htmlspecialchars( $edit_info_link->getFullURL() ) . '/custom">' .
-					wfMessage( 'user-edit-this' )->escaped() . '</a>';
-			}
-			$output .= '</div>
-					<div class="visualClear"></div>
-				</div>
-			</div>
-			<div class="visualClear"></div>
-			<div class="profile-info-container">' .
-				$custom_output .
-			'</div>';
-		} elseif ( $this->viewingUser->getName() == $this->profileOwner->getName() ) {
-			$output .= '<div class="user-section-heading">
-				<div class="user-section-title">' .
-					wfMessage( 'custom-info-title' )->escaped() .
-				'</div>
-				<div class="user-section-actions">
-					<div class="action-right">
-						<a href="' . htmlspecialchars( $edit_info_link->getFullURL() ) . '/custom">' .
-							wfMessage( 'user-edit-this' )->escaped() .
-						'</a>
-					</div>
-					<div class="visualClear"></div>
-				</div>
-			</div>
-			<div class="visualClear"></div>
-			<div class="no-info-container">' .
-				wfMessage( 'custom-no-info' )->escaped() .
-			'</div>';
-		}
-
-		return $output;
-	}
 
 	/**
 	 * Get the interests (favorite movies, TV shows, music, etc.) for a given

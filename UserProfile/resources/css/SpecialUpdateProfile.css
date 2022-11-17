@@ -146,15 +146,25 @@
 /** @todo FIXME: this is an awful hack for Special:UpdateProfile (the "personal information" page) */
 div.eye-container[fieldkey="up_real_name"],
 div.eye-container[fieldkey="up_email"],
-div.eye-container[fieldkey="up_location_city"],
-div.eye-container[fieldkey="up_hometown_country"],
+div.eye-container[fieldkey="up_location_city"] {
+	top: -15px !important;
+}
+
+div.eye-container[fieldkey="up_location_state"] {
+	top: -10px !important;
+}
+
+div.eye-container[fieldkey="up_hometown_country"] {
+	top: -25px !important;
+}
+
 div.eye-container[fieldkey="up_birthday"] {
-	top: 5px;
+	top: -45px !important;
 }
 
 div.eye-container[fieldkey="up_hometown_city"],
 div.eye-container[fieldkey="up_location_country"] {
-	top: 10px;
+	top: -20px;
 }
 
 .eye-container:hover {
