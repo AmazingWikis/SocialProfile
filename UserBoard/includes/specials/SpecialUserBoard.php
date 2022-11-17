@@ -155,10 +155,9 @@ class SpecialViewUserBoard extends SpecialPage {
 			if (
 				$currentUser->getName() == $user_name ||
 				$currentUser->isAllowed( 'userboard-delete' )
-			) {
-				$total = $total;
-			}
-		} else {
+			) {}	
+		} 
+		else {
 			$total = $b->getUserBoardToBoardCount( ( $userFromURL ? User::newFromName( $userFromURL ) : $currentUser ), $user_2 );
 		}
 
@@ -206,13 +205,6 @@ class SpecialViewUserBoard extends SpecialPage {
 				htmlspecialchars( $this->msg( 'userboard_boardtoboard' )->plain() ) . '</a>';
 		}
 
-		if ( $total ) {
-			$output .= '<div class="user-page-message-top">
-			<span class="user-page-message-count">' .
-				$this->msg( 'userboard_showingmessages', $total, $start, $end, $end - $start + 1 )->parse() .
-			"</span> {$board_to_board}
-			</div>";
-		}
 
 		/**
 		 * Build next/prev navigation links
@@ -221,7 +213,7 @@ class SpecialViewUserBoard extends SpecialPage {
 		if ( $user_2 ) {
 			$qs['conv'] = $user_name_2;
 		}
-		$numofpages = $total / $per_page;
+		/*$numofpages = $total / $per_page;
 
 		if ( $numofpages > 1 ) {
 			$output .= '<div class="page-nav">';
@@ -276,7 +268,7 @@ class SpecialViewUserBoard extends SpecialPage {
 					);
 			}
 			$output .= '</div><p>';
-		}
+		}*/
 
 		$can_post = false;
 		$user_name_from = ''; // Prevent E_NOTICE

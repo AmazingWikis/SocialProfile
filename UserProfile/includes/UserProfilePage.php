@@ -806,18 +806,7 @@ class UserProfilePage extends Article {
 			return '';
 		}
 
-		$output = ''; // Prevent E_NOTICE
-
-
-		// If the user is viewing their own profile or is allowed to delete
-		// board messages, add the amount of private messages to the total
-		// sum of board messages.
-		if (
-			$this->viewingUser->getName() == $this->profileOwner->getName() ||
-			$this->viewingUser->isAllowed( 'userboard-delete' )
-		) {
-			$total = $total + $stats_data['user_board_priv'];
-		}
+		$output = ''; // Prevent E_NOTICE			
 
 		$output .= '<div class="user-section-heading">
 			<div class="user-section-title">' .
@@ -825,32 +814,8 @@ class UserProfilePage extends Article {
 			'</div>
 			<div class="user-section-actions">
 				<div class="action-right">';
-		if ( $this->viewingUser->getName() == $this->profileOwner->getName() ) {
-			if ( $friends ) {
-				$output .= '<a href="' .
-					htmlspecialchars(
-						SpecialPage::getTitleFor( 'SendBoardBlast' )->getFullURL()
-					) . '">' .
-					wfMessage( 'user-send-board-blast' )->escaped() . '</a>';
-			}
-			if ( $total > 10 ) {
-				$output .= wfMessage( 'pipe-separator' )->escaped();
-			}
-		}
-		if ( $total > 10 ) {
-			$output .= '<a href="' .
-				htmlspecialchars(
-					SpecialPage::getTitleFor( 'UserBoard' )->getFullURL( [ 'user' => $this->profileOwner->getName() ] )
-				) . '">' .
-				wfMessage( 'user-view-all' )->escaped() . '</a>';
-		}
-		$output .= '</div>
-				<div class="action-left">';
-		if ( $total > 10 ) {
-			$output .= wfMessage( 'user-count-separator', '10', $total )->escaped();
-		} elseif ( $total > 0 ) {
-			$output .= wfMessage( 'user-count-separator', $total, $total )->escaped();
-		}
+		if ( $this->viewingUser->getName() == $this->profileOwner->getName() ) { }
+		
 		$output .= '</div>
 				<div class="visualClear"></div>
 			</div>
