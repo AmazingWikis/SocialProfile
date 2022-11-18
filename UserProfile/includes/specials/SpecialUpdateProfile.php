@@ -137,21 +137,6 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 
 		if ( $request->wasPosted() && $user->matchEditToken( $request->getVal( 'wpEditToken' ) ) ) {
 			// NoJS support
-			if ( $request->getBool( 'should_update_field_visibilities' ) ) {
-				$newFieldVisibilities = [];
-				foreach ( $request->getValues() as $key => $val ) {
-					if ( preg_match( '/up_/i', $key ) ) {
-						$newFieldVisibilities[$key] = $val;
-					}
-				}
-				if ( !empty( $newFieldVisibilities ) ) {
-					foreach ( $newFieldVisibilities as $fieldKey => $visibility ) {
-						// TODO Would be nice if the SPUserSecurity class had a batch API of
-						// some kind for situations like these...
-						SPUserSecurity::setPrivacy( $user, $fieldKey, $visibility );
-					}
-				}
-			}
 
 			if ( !$section ) {
 				$section = 'basic';
@@ -219,7 +204,6 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 	 * @param User $user Representing the current user
 	 */
 	function saveBasicSettings( $user ) {
-		global $wgEmailAuthentication;
 
 		$request = $this->getRequest();
 
@@ -241,6 +225,7 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 		return $birthday_date;
 	}
 
+	// WHY DOES THIS DUPLICATION EXIST???? Don't remove it
 	public static function formatBirthday( $birthday, $showYOB = false ) {
 		$dob = explode( '-', $birthday );
 		if ( count( $dob ) == 3 ) {
@@ -423,6 +408,19 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 			<div class="visualClear">' . '</div>
 		</div><div class="visualClear"></div>';
 
+		$form .= '<div class="profile-update">
+			<p class="profile-update-title">' . $this->msg( 'user-profile-personal-join' )->escaped() . '</p>
+			<p class="profile-update-unit-left" id="birthday-format">' .
+				$this->msg( $showYOJ ? 'user-profile-personal-join-with-year' : 'user-profile-personal-joindate' )->escaped() .
+			'</p>
+			<p class="profile-update-unit"><input type="text"' .
+			( $showYOJ ? ' class="long-join"' : null ) .
+			' size="25" name="joindate" id="joindate" value="' .
+			( isset( $joindate ) ? htmlspecialchars( $joindate, ENT_QUOTES ) : '' ) . '" /></p>
+			<div class="visualClear">' . '</div>
+		</div><div class="visualClear"></div>';
+
+
 		$form .= '<div class="profile-update" id="profile-update-personal-aboutme">
 			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-aboutme' )->escaped() . '</p>
 			<p class="profile-update-unit">
@@ -432,32 +430,42 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 		</div>
 		<div class="visualClear"></div>
 
-		<div class="profile-update" id="profile-update-personal-work">
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-occupation' )->escaped() . '</p>
+		<div class="profile-update" id="profile-update-personal-hobbies">
+			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-hobbies' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="occupation" id="occupation" rows="2" cols="75">' . ( isset( $occupation ) ? htmlspecialchars( $occupation, ENT_QUOTES ) : '' ) . '</textarea>
-			</p>
-			<div class="visualClear">' . '</div>
-		</div>
-		<div class="visualClear"></div>
-
-		<div class="profile-update" id="profile-update-personal-education">
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-schools' )->escaped() . '</p>
-			<p class="profile-update-unit">
-				<textarea name="schools" id="schools" rows="2" cols="75">' . ( isset( $schools ) ? htmlspecialchars( $schools, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="hobbies" id="occupation" rows="2" cols="75">' . ( isset( $hobbies) ? htmlspecialchars( $hobbies, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
 		</div>
 		<div class="visualClear"></div>
 
 		<div class="profile-update">
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-placeslived' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-best-zelda-moment' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="places" id="places" rows="3" cols="75">' . ( isset( $places ) ? htmlspecialchars( $places, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="bestZeldaMoment" id="schools" rows="2" cols="75">' . ( isset( $bestZeldaMoment) ? htmlspecialchars( $bestZeldaMoment, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
 		</div>
 		<div class="visualClear"></div>
+
+		<div class="profile-update">
+			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-favorite-zelda-character' )->escaped() . '</p>
+			<p class="profile-update-unit">
+				<textarea name="places" id="places" rows="3" cols="75">' . ( isset( $favoriteZeldaCharacter ) ? htmlspecialchars( $favoriteZeldaCharacter , ENT_QUOTES ) : '' ) . '</textarea>
+			</p>
+			<div class="visualClear">' . '</div>
+		</div>
+		<div class="visualClear"></div>
+
+		<div class="profile-update">
+			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-worst-zelda-moment' )->escaped() . '</p>
+			<p class="profile-update-unit">
+				<textarea name="places" id="places" rows="3" cols="75">' . ( isset( $worstZeldaMoment ) ? htmlspecialchars( $worstZeldaMoment , ENT_QUOTES ) : '' ) . '</textarea>
+			</p>
+			<div class="visualClear">' . '</div>
+		</div>
+		<div class="visualClear"></div>
+
 
 		<div class="profile-update">
 			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-websites' )->escaped() . '</p>

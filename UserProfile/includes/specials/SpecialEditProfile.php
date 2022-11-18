@@ -218,6 +218,13 @@ class SpecialEditProfile extends SpecialUpdateProfile {
 
 		$form .= '<div class="profile-update">
 			<p class="profile-update-title">' . $this->msg( 'user-profile-personal-birthday' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-join-with-year' )->escaped() . '</p>
+			<p class="profile-update-unit"><input type="text" class="long-birthday" size="25" name="birthday" id="birthday" value="' . ( isset( $birthday ) ? htmlspecialchars( $birthday, ENT_QUOTES ) : '' ) . '" /></p>
+			<div class="visualClear"></div>
+		</div><div class="visualClear"></div>';
+
+		$form .= '<div class="profile-update">
+			<p class="profile-update-title">' . $this->msg( 'user-profile-personal-join' )->escaped() . '</p>
 			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-birthdate-with-year' )->escaped() . '</p>
 			<p class="profile-update-unit"><input type="text" class="long-birthday" size="25" name="birthday" id="birthday" value="' . ( isset( $birthday ) ? htmlspecialchars( $birthday, ENT_QUOTES ) : '' ) . '" /></p>
 			<div class="visualClear"></div>

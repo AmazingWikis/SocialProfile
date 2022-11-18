@@ -51,6 +51,13 @@
 			dateFormat: $( '#birthday' ).hasClass( 'long-birthday' ) ? 'mm/dd/yy' : 'mm/dd'
 		} );
 
+		$( '#joindate' ).datepicker( {
+			changeYear: true,
+			yearRange: '1930:c',
+			dateFormat: $( '#joindate' ).hasClass( 'long-join' ) ? 'mm/dd/yy' : 'mm/dd'
+		} );
+
+
 		// US state selector -- but only on [[Special:UpdateProfile]] and [[Special:EditProfile]],
 		// *not* on [[Special:UpdateProfile/custom]] etc.!
 		if (
