@@ -440,27 +440,36 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 		<div class="visualClear"></div>
 
 		<div class="profile-update">
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-best-zelda-moment' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-best-moment' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="bestZeldaMoment" id="schools" rows="2" cols="75">' . ( isset( $bestZeldaMoment) ? htmlspecialchars( $bestZeldaMoment, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="bestZeldaMoment" id="schools" rows="2" cols="75">' . ( isset( $bestMoment) ? htmlspecialchars( $bestMoment, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
 		</div>
 		<div class="visualClear"></div>
 
 		<div class="profile-update">
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-favorite-zelda-character' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-favorite-character' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="places" id="places" rows="3" cols="75">' . ( isset( $favoriteZeldaCharacter ) ? htmlspecialchars( $favoriteZeldaCharacter , ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="places" id="places" rows="3" cols="75">' . ( isset( $favoriteCharacter ) ? htmlspecialchars( $favoriteCharacter , ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
 		</div>
 		<div class="visualClear"></div>
 
 		<div class="profile-update">
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-worst-zelda-moment' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-favorite-item' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="places" id="places" rows="3" cols="75">' . ( isset( $worstZeldaMoment ) ? htmlspecialchars( $worstZeldaMoment , ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="places" id="places" rows="3" cols="75">' . ( isset( $favoriteItem ) ? htmlspecialchars( $favoriteItem , ENT_QUOTES ) : '' ) . '</textarea>
+			</p>
+			<div class="visualClear">' . '</div>
+		</div>
+		<div class="visualClear"></div>
+
+		<div class="profile-update">
+			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-worst-moment' )->escaped() . '</p>
+			<p class="profile-update-unit">
+				<textarea name="places" id="places" rows="3" cols="75">' . ( isset( $worstMoment ) ? htmlspecialchars( $worstMoment , ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
 		</div>

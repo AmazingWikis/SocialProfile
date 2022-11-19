@@ -386,83 +386,6 @@ class UserProfilePage extends Article {
 	}
 
 	/**
-	 * Get the custom info (site-specific stuff) for a given user.
-	 *
-	 * @return string HTML
-	 */
-	function getCustomInfo() {
-		global $wgUserProfileDisplay;
-
-		if ( $wgUserProfileDisplay['custom'] == false ) {
-			return '';
-		}
-
-		$this->initializeProfileData();
-
-		$profile_data = $this->profile_data;
-
-		$joined_data = $profile_data['custom_1'] . $profile_data['custom_2'] .
-						$profile_data['custom_3'] . $profile_data['custom_4'];
-		$edit_info_link = SpecialPage::getTitleFor( 'UpdateProfile' );
-
-		$custom_output = '';
-		if ( in_array( 'up_custom_1', $this->profile_visible_fields ) ) {
-			$custom_output .= $this->getProfileSection( wfMessage( 'custom-info-field1' )->escaped(), $profile_data['custom_1'], false );
-		}
-		if ( in_array( 'up_custom_2', $this->profile_visible_fields ) ) {
-			$custom_output .= $this->getProfileSection( wfMessage( 'custom-info-field2' )->escaped(), $profile_data['custom_2'], false );
-		}
-		if ( in_array( 'up_custom_3', $this->profile_visible_fields ) ) {
-			$custom_output .= $this->getProfileSection( wfMessage( 'custom-info-field3' )->escaped(), $profile_data['custom_3'], false );
-		}
-		if ( in_array( 'up_custom_4', $this->profile_visible_fields ) ) {
-			$custom_output .= $this->getProfileSection( wfMessage( 'custom-info-field4' )->escaped(), $profile_data['custom_4'], false );
-		}
-
-		$output = '';
-		if ( $joined_data ) {
-			$output .= '<div class="user-section-heading">
-				<div class="user-section-title">' .
-					wfMessage( 'custom-info-title' )->escaped() .
-				'</div>
-				<div class="user-section-actions">
-					<div class="action-right">';
-			if ( $this->viewingUser->getName() == $this->profileOwner->getName() ) {
-				$output .= '<a href="' . htmlspecialchars( $edit_info_link->getFullURL() ) . '/custom">' .
-					wfMessage( 'user-edit-this' )->escaped() . '</a>';
-			}
-			$output .= '</div>
-					<div class="visualClear"></div>
-				</div>
-			</div>
-			<div class="visualClear"></div>
-			<div class="profile-info-container">' .
-				$custom_output .
-			'</div>';
-		} elseif ( $this->viewingUser->getName() == $this->profileOwner->getName() ) {
-			$output .= '<div class="user-section-heading">
-				<div class="user-section-title">' .
-					wfMessage( 'custom-info-title' )->escaped() .
-				'</div>
-				<div class="user-section-actions">
-					<div class="action-right">
-						<a href="' . htmlspecialchars( $edit_info_link->getFullURL() ) . '/custom">' .
-							wfMessage( 'user-edit-this' )->escaped() .
-						'</a>
-					</div>
-					<div class="visualClear"></div>
-				</div>
-			</div>
-			<div class="visualClear"></div>
-			<div class="no-info-container">' .
-				wfMessage( 'custom-no-info' )->escaped() .
-			'</div>';
-		}
-
-		return $output;
-	}
-
-	/**
 	 * Get the interests (favorite movies, TV shows, music, etc.) for a given
 	 * user.
 	 *
@@ -632,21 +555,6 @@ class UserProfilePage extends Article {
 				<div id="profile-title">' .
 					htmlspecialchars( $this->profileOwner->getName() ) .
 				'</div>';
-		// Show the user's level and the amount of points they have if
-		// UserLevels has been configured
-		if ( $wgUserLevels ) {
-			$output .= '<div id="points-level">
-					<a href="' . htmlspecialchars( $level_link->getFullURL() ) . '">' .
-						wfMessage(
-							'user-profile-points',
-							$language->formatNum( $stats_data['points'] )
-						)->escaped() .
-					'</a>
-					</div>
-					<div id="honorific-level">
-						<a href="' . htmlspecialchars( $level_link->getFullURL() ) . '" rel="nofollow">(' . htmlspecialchars( $user_level->getLevelName() ) . ')</a>
-					</div>';
-		}
 		$output .= '<div class="visualClear"></div>
 			</div>
 			<div class="profile-actions">';
@@ -724,28 +632,6 @@ class UserProfilePage extends Article {
 	}
 
 	/**
-	 * Get the relationships for a given user.
-	 *
-	 * @param int $rel_type
-	 * - 1 for friends
-	 * - 2 (or anything else than 1) for foes
-	 *
-	 * @return string
-	 */
-	function getRelationships( $rel_type ) {
-		global $wgUserProfileDisplay;
-
-		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
-		$context = $this->getContext();
-		$language = $context->getLanguage();
-
-
-		$output = ''; // Prevent E_NOTICE
-
-		return $output;
-	}
-
-	/**
 	 * Gets the recent social activity for a given user.
 	 *
 	 * @return string HTML
@@ -762,8 +648,6 @@ class UserProfilePage extends Article {
 
 		$limit = 8;
 		$rel = new UserActivity( $this->profileOwner, 'user', $limit );
-		$rel->setActivityToggle( 'show_votes', 0 );
-		$rel->setActivityToggle( 'show_gifts_sent', 1 );
 
 		/**
 		 * Get all relationship activity
@@ -828,8 +712,6 @@ class UserProfilePage extends Article {
 				$icon = $userActivityIcon->getIconHTML();
 				$item_html .= "<div class=\"{$class}\">" . $icon;
 
-				$viewGift = SpecialPage::getTitleFor( 'ViewGift' );
-
 				switch ( $item['type'] ) {
 					case 'edit':
 						$item_html .= wfMessage( 'user-recent-activity-edit' )->escaped() . " {$page_link} {$item_time}
@@ -838,63 +720,6 @@ class UserProfilePage extends Article {
 							$item_html .= "\"{$item['comment']}\"";
 						}
 						$item_html .= '</div>';
-						break;
-					case 'vote':
-						$item_html .= wfMessage( 'user-recent-activity-vote' )->escaped() . " {$page_link} {$item_time}";
-						break;
-					case 'comment':
-						$item_html .= wfMessage( 'user-recent-activity-comment' )->escaped() . " {$page_link} {$item_time}
-							<div class=\"item\">
-								\"{$item['comment']}\"
-							</div>";
-						break;
-					case 'gift-sent':
-						$userGiftIcon = new UserGiftIcon( $item['namespace'], 'm' );
-						$icon = $userGiftIcon->getIconHTML();
-
-						$item_html .= wfMessage( 'user-recent-activity-gift-sent' )->escaped() . " {$user_link_2} {$item_time}
-						<div class=\"item\">
-							<a href=\"" . htmlspecialchars( $viewGift->getFullURL( "gift_id={$item['id']}" ) ) . "\" rel=\"nofollow\">
-								{$icon}" .
-								htmlspecialchars( $item['pagetitle'] ) .
-							'</a>
-						</div>';
-						break;
-					case 'gift-rec':
-						$userGiftIcon = new UserGiftIcon( $item['namespace'], 'm' );
-						$icon = $userGiftIcon->getIconHTML();
-
-						$item_html .= wfMessage( 'user-recent-activity-gift-rec' )->escaped() . " {$user_link_2} {$item_time}
-								<div class=\"item\">
-									<a href=\"" . htmlspecialchars( $viewGift->getFullURL( "gift_id={$item['id']}" ) ) . "\" rel=\"nofollow\">
-										{$icon}" .
-										htmlspecialchars( $item['pagetitle'] ) .
-									'</a>
-								</div>';
-						break;
-					case 'system_gift':
-						$systemGiftIcon = new SystemGiftIcon( $item['namespace'], 'm' );
-						$icon = $systemGiftIcon->getIconHTML();
-
-						$viewSystemGift = SpecialPage::getTitleFor( 'ViewSystemGift' );
-						$item_html .= wfMessage( 'user-recent-system-gift' )->escaped() . " {$item_time}
-								<div class=\"user-home-item-gift\">
-									<a href=\"" . htmlspecialchars( $viewSystemGift->getFullURL( "gift_id={$item['id']}" ) ) . "\" rel=\"nofollow\">
-										{$icon}" .
-										htmlspecialchars( $item['pagetitle'] ) .
-									'</a>
-								</div>';
-						break;
-					case 'friend':
-						$item_html .= wfMessage( 'user-recent-activity-friend' )->escaped() .
-							" <b>{$user_link_2}</b> {$item_time}";
-						break;
-					case 'foe':
-						$item_html .= wfMessage( 'user-recent-activity-foe' )->escaped() .
-							" <b>{$user_link_2}</b> {$item_time}";
-						break;
-					case 'system_message':
-						$item_html .= "{$item['comment']} {$item_time}";
 						break;
 					case 'user_message':
 						$item_html .= wfMessage( 'user-recent-activity-user-message' )->escaped() .
@@ -906,19 +731,6 @@ class UserProfilePage extends Article {
 								"\" rel=\"nofollow\">" . htmlspecialchars( $item['comment'] ) . "</a></b>  {$item_time}
 								<div class=\"item\">
 								\"{$item['namespace']}\"
-								</div>";
-						break;
-					case 'network_update':
-						$network_image = SportsTeams::getLogo( $item['sport_id'], $item['team_id'], 's' );
-						$item_html .= wfMessage( 'user-recent-activity-network-update' )->escaped() .
-								'<div class="item">
-									<a href="' . htmlspecialchars(
-										SpecialPage::getTitleFor( 'FanHome' )->getFullURL( [
-											'sport_id' => $item['sport_id'],
-											'team_id' => $item['team_id']
-										] )
-									) .
-									"\" rel=\"nofollow\">{$network_image} \"{$item['comment']}\"</a>
 								</div>";
 						break;
 				}
