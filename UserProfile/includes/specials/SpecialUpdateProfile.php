@@ -299,7 +299,7 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 
 		$dbw = wfGetDB( DB_MASTER );
 
-		$interestsData = [
+		$accountLinksData = [
 			'up_companies' => $request->getVal( 'companies' ),
 			'up_movies' => $request->getVal( 'movies' ),
 			'up_music' => $request->getVal( 'music' ),
@@ -313,13 +313,13 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 
 		$dbw->update(
 			'user_profile',
-			/* SET */$interestsData,
+			/* SET */$accountLinksData ,
 			/* WHERE */[ 'up_actor' => $user->getActorId() ],
 			__METHOD__
 		);
 
-		// PersonalInterestsChanged hook
-		Hooks::run( 'PersonalInterestsChanged', [ $user, $interestsData ] );
+		// PersonalAccountLinksChanged hook
+		Hooks::run( 'PersonalInterestsChanged', [ $user, $accountLinksData ] );
 		// end of the hook
 
 		UserProfile::clearCache( $user );
@@ -350,6 +350,8 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 			$userOptionsLookup = MediaWikiServices::getInstance()->getUserOptionsLookup();
 			$showYOB = $userOptionsLookup->getIntOption( $user, 'showyearofbirth', !isset( $s->up_birthday ) ) == 1;
 			$birthday = self::formatBirthday( $s->up_birthday, $showYOB );
+			//$showYOJ = $userOptionsLookup->getIntOption( $user, 'showyearofjoin', !isset( $s->up_joindate ) ) == 1;
+			//$joindate = self::formatBirthday( $s->up_joindate, $showYOJ );
 			$schools = $s->up_schools;
 			$places = $s->up_places_lived;
 			$websites = $s->up_websites;
@@ -365,7 +367,7 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 
 		$this->getOutput()->setPageTitle( $this->msg( 'edit-profile-title' )->escaped() );
 
-		$form = UserProfile::getEditProfileNav( $this->msg( 'user-profile-section-personal' )->escaped() );
+		$form = UserProfile::getEditProfileNav( $this->msg( 'user-profile-section-basicinfo' )->escaped() );
 		$form .= '<form action="" method="post" enctype="multipart/form-data" name="profile">';
 		// NoJS thing -- JS sets this to false, which means that in execute() we skip updating
 		// profile field visibilities for users with JS enabled can do and have already done that
@@ -418,7 +420,17 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 			' size="25" name="joindate" id="joindate" value="' .
 			( isset( $joindate ) ? htmlspecialchars( $joindate, ENT_QUOTES ) : '' ) . '" /></p>
 			<div class="visualClear">' . '</div>
-		</div><div class="visualClear"></div>';
+		</div><div class="visualClear"></div>
+
+		<div class="profile-update" id="profile-update-personal-websites">
+			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-websites' )->escaped() . '</p>
+			<p class="profile-update-unit">
+				<textarea name="websites " id="websites " rows="3" cols="75">' . ( isset( $websites ) ? htmlspecialchars( $websites , ENT_QUOTES ) : '' ) . '</textarea>
+			</p>
+			<div class="visualClear">' . '</div>
+		</div>
+		<div class="visualClear"></div>';
+
 
 
 		$form .= '<div class="profile-update" id="profile-update-personal-aboutme">
@@ -473,16 +485,6 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 			</p>
 			<div class="visualClear">' . '</div>
 		</div>
-		<div class="visualClear"></div>
-
-
-		<div class="profile-update">
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-websites' )->escaped() . '</p>
-			<p class="profile-update-unit">
-				<textarea name="websites" id="websites" rows="2" cols="75">' . ( isset( $websites ) ? htmlspecialchars( $websites, ENT_QUOTES ) : '' ) . '</textarea>
-			</p>
-			<div class="visualClear">' . '</div>
-		</div>
 		<div class="visualClear"></div>';
 
 		$form .= '
@@ -529,9 +531,9 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 			$drinks = $s->up_drinks;
 		}
 
-		$this->getOutput()->setPageTitle( $this->msg( 'user-profile-section-interests' )->escaped() );
+		$this->getOutput()->setPageTitle( $this->msg( 'edit-profile-title' )->escaped() );
 
-		$form = UserProfile::getEditProfileNav( $this->msg( 'user-profile-section-interests' )->escaped() );
+		$form = UserProfile::getEditProfileNav( $this->msg( 'user-profile-section-accountlinks' )->escaped() );
 		$form .= '<form action="" method="post" enctype="multipart/form-data" name="profile">';
 		// NoJS thing -- JS sets this to false, which means that in execute() we skip updating
 		// profile field visibilities for users with JS enabled can do and have already done that
@@ -540,50 +542,76 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 		$form .= Html::hidden( 'should_update_field_visibilities', true );
 		$form .= '<div class="profile-info profile-info-other-info clearfix">
 			<div class="profile-update">
-			<p class="profile-update-title">' . $this->msg( 'user-profile-interests-entertainment' )->escaped() . '</p>
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-interests-movies' )->escaped() . '</p>
+			<p class="profile-update-title">' . $this->msg( 'account-links' )->escaped() . '</p>
+
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-friendcode' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="movies" id="movies" rows="3" cols="75">' . ( isset( $movies ) ? htmlspecialchars( $movies, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="friendcode" id="friendcode" rows="3" cols="75">' . ( isset( $friendcode) ? htmlspecialchars( $friendcode, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-interests-tv' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-steam' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="tv" id="tv" rows="3" cols="75">' . ( isset( $tv ) ? htmlspecialchars( $tv, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="steam" id="steam" rows="3" cols="75">' . ( isset( $steam) ? htmlspecialchars( $steam, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-interests-music' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-xbox' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="music" id="music" rows="3" cols="75">' . ( isset( $music ) ? htmlspecialchars( $music, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="xbox" id="xbox" rows="3" cols="75">' . ( isset( $xbox ) ? htmlspecialchars( $xbox, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-interests-books' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-twitter' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="books" id="books" rows="3" cols="75">' . ( isset( $books ) ? htmlspecialchars( $books, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="twitter" id="twitter" rows="3" cols="75">' . ( isset( $twitter ) ? htmlspecialchars( $twitter, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-interests-magazines' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-mastodon' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="magazines" id="magazines" rows="3" cols="75">' . ( isset( $magazines ) ? htmlspecialchars( $magazines, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="mastodon" id="mastodon" rows="3" cols="75">' . ( isset( $mastodon ) ? htmlspecialchars( $mastodon, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-interests-videogames' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-instagram' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="videogames" id="videogames" rows="3" cols="75">' . ( isset( $videogames ) ? htmlspecialchars( $videogames, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="instagram" id="instagram" rows="3" cols="75">' . ( isset( $instagram ) ? htmlspecialchars( $instagram, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' .  '</div>
-			</div>
-			<div class="profile-info">
-			<p class="profile-update-title">' . $this->msg( 'user-profile-interests-eats' )->escaped() . '</p>
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-interests-foodsnacks' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-discord' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="snacks" id="snacks" rows="3" cols="75">' . ( isset( $snacks ) ? htmlspecialchars( $tv, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="discord" id="discord" rows="3" cols="75">' . ( isset( $discord ) ? htmlspecialchars( $discord, ENT_QUOTES ) : '' ) . '</textarea>
+			</p>
+			
+			<div class="visualClear">' . '</div>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-irc' )->escaped() . '</p>
+			<p class="profile-update-unit">
+				<textarea name="irc" id="irc" rows="3" cols="75">' . ( isset( $irc ) ? htmlspecialchars( $irc, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
-			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-interests-drinks' )->escaped() . '</p>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-reddit' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="drinks" id="drinks" rows="3" cols="75">' . ( isset( $drinks ) ? htmlspecialchars( $drinks, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="reddit" id="reddit" rows="3" cols="75">' . ( isset( $reddit ) ? htmlspecialchars( $reddit, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-twitch' )->escaped() . '</p>
+			<p class="profile-update-unit">
+				<textarea name="twitch" id="twitch" rows="3" cols="75">' . ( isset( $twitch ) ? htmlspecialchars( $twitch, ENT_QUOTES ) : '' ) . '</textarea>
+			</p>
+			<div class="visualClear">' . '</div>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-youtube' )->escaped() . '</p>
+			<p class="profile-update-unit">
+				<textarea name="youtube" id="youtube" rows="3" cols="75">' . ( isset( $youtube ) ? htmlspecialchars( $youtube, ENT_QUOTES ) : '' ) . '</textarea>
+			</p>
+
+
+			<div class="visualClear">' . '</div>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-rumble' )->escaped() . '</p>
+			<p class="profile-update-unit">
+				<textarea name="rumble" id="rumble" rows="3" cols="75">' . ( isset( $rumble ) ? htmlspecialchars( $rumble, ENT_QUOTES ) : '' ) . '</textarea>
+			</p>
+			<div class="visualClear">' . '</div>
+			<p class="profile-update-unit-left">' . $this->msg( 'account-links-bitchute' )->escaped() . '</p>
+			<p class="profile-update-unit">
+				<textarea name="bitchute" id="bitchute" rows="3" cols="75">' . ( isset( $bitchute ) ? htmlspecialchars( $bitchute, ENT_QUOTES ) : '' ) . '</textarea>
+			</p>
+
 			</div>
 			<input type="submit" class="site-button" value="' . $this->msg( 'user-profile-update-button' )->escaped() . '" size="20" onclick="document.profile.submit()" />
 			</div>

@@ -149,6 +149,9 @@ class UserProfile {
 			$userOptionsLookup = MediaWikiServices::getInstance()->getUserOptionsLookup();
 			$showYOB = $userOptionsLookup->getIntOption( $this->user, 'showyearofbirth', !isset( $row->up_birthday ) ) == 1;
 			$issetUpBirthday = $row->up_birthday ?? '';
+			//$showYOJ = $userOptionsLookup->getIntOption( $this->user, 'showyearofjoin', !isset( $row->up_join ) ) == 1;
+			//$issetUpjoin = $row->up_join ?? '';
+
 			$profile['location_city'] = $row->up_location_city ?? '';
 			$profile['location_state'] = $row->up_location_state ?? '';
 			$profile['location_country'] = $row->up_location_country ?? '';
