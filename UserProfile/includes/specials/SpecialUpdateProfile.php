@@ -367,7 +367,7 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 
 		$this->getOutput()->setPageTitle( $this->msg( 'edit-profile-title' )->escaped() );
 
-		$form = UserProfile::getEditProfileNav( $this->msg( 'user-profile-section-basicinfo' )->escaped() );
+		$form = UserProfile::getEditProfileNav( $this->msg( 'user-profile-section-biography' )->escaped() );
 		$form .= '<form action="" method="post" enctype="multipart/form-data" name="profile">';
 		// NoJS thing -- JS sets this to false, which means that in execute() we skip updating
 		// profile field visibilities for users with JS enabled can do and have already done that
@@ -445,7 +445,7 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 		<div class="profile-update" id="profile-update-personal-hobbies">
 			<p class="profile-update-unit-left">' . $this->msg( 'user-profile-personal-hobbies' )->escaped() . '</p>
 			<p class="profile-update-unit">
-				<textarea name="hobbies" id="occupation" rows="2" cols="75">' . ( isset( $hobbies) ? htmlspecialchars( $hobbies, ENT_QUOTES ) : '' ) . '</textarea>
+				<textarea name="hobbies" id="hobbies" rows="2" cols="75">' . ( isset( $hobbies) ? htmlspecialchars( $hobbies, ENT_QUOTES ) : '' ) . '</textarea>
 			</p>
 			<div class="visualClear">' . '</div>
 		</div>
@@ -533,7 +533,7 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 
 		$this->getOutput()->setPageTitle( $this->msg( 'edit-profile-title' )->escaped() );
 
-		$form = UserProfile::getEditProfileNav( $this->msg( 'user-profile-section-accountlinks' )->escaped() );
+		$form = UserProfile::getEditProfileNav( $this->msg( 'user-profile-section-accountLinks' )->escaped() );
 		$form .= '<form action="" method="post" enctype="multipart/form-data" name="profile">';
 		// NoJS thing -- JS sets this to false, which means that in execute() we skip updating
 		// profile field visibilities for users with JS enabled can do and have already done that

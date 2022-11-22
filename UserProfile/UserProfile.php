@@ -18,9 +18,6 @@ $wgUserProfileAvatarsInDiffs = false;
  * $wgUserProfileThresholds = [ 'edits' => 5 ];
  * @endcode
  *
- * To require both ten edits *and* three friends, set:
- * @code
- * $wgUserProfileThresholds = [ 'edits' => 10, 'friend-count' => 3 ];
  * @endcode
  */
 $wgUserProfileThresholds = [
@@ -37,8 +34,8 @@ $wgUserProfileDisplay['board'] = true;
 $wgUserProfileDisplay['activity'] = true; // Display recent social activity?
 $wgUserProfileDisplay['profile'] = true;
 $wgUserProfileDisplay['personal'] = true;
-$wgUserProfileDisplay['interests'] = true;
-
+$wgUserProfileDisplay['biography'] = true;
+$wgUserProfileDisplay['accountlinks'] = true;
 
 $wgUpdateProfileInRecentChanges = false; // Show a log entry in recent changes whenever a user updates their profile?
 $wgUploadAvatarInRecentChanges = false; // Same as above, but for avatar uploading

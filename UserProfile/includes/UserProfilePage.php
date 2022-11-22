@@ -144,9 +144,6 @@ class UserProfilePage extends Article {
 		// Avoid PHP 7.1 warning of passing $this by reference
 		$userProfilePage = $this;
 
-		$out->addHTML( $this->getPersonalInfo() );
-
-		$out->addHTML( $this->getInterests() );
 
 
 		if ( !Hooks::run( 'UserProfileBeginLeft', [ &$userProfilePage ] ) ) {
@@ -155,6 +152,12 @@ class UserProfilePage extends Article {
 			] );
 		}
 
+		$out->addHTML( $this->getPersonalInfo() );
+
+		$out->addHTML( $this->getAccountLinks() );
+
+		// @phan-suppress-next-line SecurityCheck-XSS
+		$out->addHTML( $this->getActivity() );
 
 		if ( !Hooks::run( 'UserProfileEndLeft', [ &$userProfilePage ] ) ) {
 			$logger->debug( "{method}: UserProfileEndLeft messed up profile!\n", [
@@ -169,16 +172,16 @@ class UserProfilePage extends Article {
 		// Right side
 		$out->addHTML( '<div id="user-page-right" class="clearfix">' );
 
-		$out->addHTML( $this->getUserBoard( $context->getUser() ) );
-		
-		// @phan-suppress-next-line SecurityCheck-XSS
-		$out->addHTML( $this->getActivity() );
-
 		if ( !Hooks::run( 'UserProfileBeginRight', [ &$userProfilePage ] ) ) {
 			$logger->debug( "{method}: UserProfileBeginRight messed up profile!\n", [
 				'method' => __METHOD__
 			] );
 		}
+
+		$out->addHTML( $this->getBiography() );
+
+		$out->addHTML( $this->getUserBoard( $context->getUser() ) );
+
 
 		if ( !Hooks::run( 'UserProfileEndRight', [ &$userProfilePage ] ) ) {
 			$logger->debug( "{method}: UserProfileEndRight messed up profile!\n", [
@@ -264,89 +267,36 @@ class UserProfilePage extends Article {
 			$location = '';
 		}
 
-		// Hometown
-		$hometown = $profile_data['hometown_city'] . ', ' . $profile_data['hometown_state'];
-		if ( $profile_data['hometown_country'] != $defaultCountry ) {
-			if ( $profile_data['hometown_city'] && $profile_data['hometown_state'] ) { // city AND state
-				$hometown = $profile_data['hometown_city'] . ', ' .
-							$profile_data['hometown_state'] . ', ' .
-							$profile_data['hometown_country'];
-				$hometown = '';
-				if ( in_array( 'up_hometown_city', $this->profile_visible_fields ) ) {
-					$hometown .= $profile_data['hometown_city'] . ', ' . $profile_data['hometown_state'];
-				}
-				if ( in_array( 'up_hometown_country', $this->profile_visible_fields ) ) {
-					$hometown .= ', ' . $profile_data['hometown_country'];
-				}
-			} elseif ( $profile_data['hometown_city'] && !$profile_data['hometown_state'] ) { // city, but no state
-				$hometown = '';
-				if ( in_array( 'up_hometown_city', $this->profile_visible_fields ) ) {
-					$hometown .= $profile_data['hometown_city'] . ', ';
-				}
-				if ( in_array( 'up_hometown_country', $this->profile_visible_fields ) ) {
-					$hometown .= $profile_data['hometown_country'];
-				}
-			} elseif ( $profile_data['hometown_state'] && !$profile_data['hometown_city'] ) { // state, but no city
-				$hometown = $profile_data['hometown_state'];
-				if ( in_array( 'up_hometown_country', $this->profile_visible_fields ) ) {
-					$hometown .= ', ' . $profile_data['hometown_country'];
-				}
-			} else {
-				$hometown = '';
-				if ( in_array( 'up_hometown_country', $this->profile_visible_fields ) ) {
-					$hometown .= $profile_data['hometown_country'];
-				}
-			}
-		}
 
-		if ( $hometown == ', ' ) {
-			$hometown = '';
-		}
-
-		$joined_data = $profile_data['real_name'] . $location . $hometown .
-						$profile_data['birthday'] . $profile_data['occupation'] .
-						$profile_data['websites'] . $profile_data['places_lived'] .
-						$profile_data['schools'] . $profile_data['about'];
+		$joined_data = $profile_data['real_name'] . $location .
+				$profile_data['birthday'] . $profile_data['joindate'] . 
+				$profile_data['websites'];
 		$edit_info_link = SpecialPage::getTitleFor( 'UpdateProfile' );
 
-		// Privacy fields holy shit!
 		$personal_output = '';
 		if ( in_array( 'up_real_name', $this->profile_visible_fields ) ) {
 			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-real-name' )->escaped(), $profile_data['real_name'], false );
 		}
 
 		$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-location' )->escaped(), $location, false );
-		$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-hometown' )->escaped(), $hometown, false );
 
 		if ( in_array( 'up_birthday', $this->profile_visible_fields ) ) {
 			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-birthday' )->escaped(), $profile_data['birthday'], false );
 		}
 
 		if ( in_array( 'up_occupation', $this->profile_visible_fields ) ) {
-			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-occupation' )->escaped(), $profile_data['occupation'], false );
+			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-joindate' )->escaped(), $profile_data['occupation'], false );
 		}
 
 		if ( in_array( 'up_websites', $this->profile_visible_fields ) ) {
 			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-websites' )->escaped(), $profile_data['websites'], false );
 		}
 
-		if ( in_array( 'up_places_lived', $this->profile_visible_fields ) ) {
-			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-places-lived' )->escaped(), $profile_data['places_lived'], false );
-		}
-
-		if ( in_array( 'up_schools', $this->profile_visible_fields ) ) {
-			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-schools' )->escaped(), $profile_data['schools'], false );
-		}
-
-		if ( in_array( 'up_about', $this->profile_visible_fields ) ) {
-			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-about-me' )->escaped(), $profile_data['about'], false );
-		}
-
 		$output = '';
 		if ( $joined_data ) {
 			$output .= '<div class="user-section-heading">
 				<div class="user-section-title">' .
-					wfMessage( 'user-personal-info-title' )->escaped() .
+					wfMessage( 'user-personal-basicinfo-title' )->escaped() .
 				'</div>
 				<div class="user-section-actions">
 					<div class="action-right">';
@@ -386,59 +336,54 @@ class UserProfilePage extends Article {
 	}
 
 	/**
-	 * Get the interests (favorite movies, TV shows, music, etc.) for a given
+	 * Get the Biography for a given
 	 * user.
 	 *
 	 * @return string HTML
 	 */
-	function getInterests() {
+	function getBiography() {
 		global $wgUserProfileDisplay;
 
-		if ( $wgUserProfileDisplay['interests'] == false ) {
+		if ( $wgUserProfileDisplay['biography'] == false ) {
 			return '';
 		}
 
 		$this->initializeProfileData();
 
 		$profile_data = $this->profile_data;
-		$joined_data = $profile_data['movies'] . $profile_data['tv'] .
-						$profile_data['music'] . $profile_data['books'] .
-						$profile_data['video_games'] .
-						$profile_data['magazines'] . $profile_data['drinks'] .
-						$profile_data['snacks'];
+		$joined_data = $profile_data['about'] . $profile_data['hobbies'] . $profile_data['bestMoment'] .
+				$profile_data['favoriteCharacter '] . $profile_data['favoriteItem'] .
+				$profile_data['worstMoment'];
+
 		$edit_info_link = SpecialPage::getTitleFor( 'UpdateProfile' );
 
 		$interests_output = '';
+
+		if ( in_array( 'up_about', $this->profile_visible_fields ) ) {
+			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-personal-aboutme' )->escaped(), $profile_data['about'], false );
+		}
+
 		if ( in_array( 'up_movies', $this->profile_visible_fields ) ) {
-			$interests_output .= $this->getProfileSection( wfMessage( 'other-info-movies' )->escaped(), $profile_data['movies'], false );
+			$interests_output .= $this->getProfileSection( wfMessage( 'user-personal-personal-hobbies' )->escaped(), $profile_data['hobbies'], false );
 		}
 		if ( in_array( 'up_tv', $this->profile_visible_fields ) ) {
-			$interests_output .= $this->getProfileSection( wfMessage( 'other-info-tv' )->escaped(), $profile_data['tv'], false );
+			$interests_output .= $this->getProfileSection( wfMessage( 'user-profile-personal-best-moment' )->escaped(), $profile_data['bestMoment'], false );
 		}
 		if ( in_array( 'up_music', $this->profile_visible_fields ) ) {
-			$interests_output .= $this->getProfileSection( wfMessage( 'other-info-music' )->escaped(), $profile_data['music'], false );
+			$interests_output .= $this->getProfileSection( wfMessage( 'user-profile-personal-favorite-character' )->escaped(), $profile_data['favoriteCharacter '], false );
 		}
 		if ( in_array( 'up_books', $this->profile_visible_fields ) ) {
-			$interests_output .= $this->getProfileSection( wfMessage( 'other-info-books' )->escaped(), $profile_data['books'], false );
+			$interests_output .= $this->getProfileSection( wfMessage( 'user-profile-personal-favorite-item' )->escaped(), $profile_data['favoriteItem'], false );
 		}
 		if ( in_array( 'up_video_games', $this->profile_visible_fields ) ) {
-			$interests_output .= $this->getProfileSection( wfMessage( 'other-info-video-games' )->escaped(), $profile_data['video_games'], false );
-		}
-		if ( in_array( 'up_magazines', $this->profile_visible_fields ) ) {
-			$interests_output .= $this->getProfileSection( wfMessage( 'other-info-magazines' )->escaped(), $profile_data['magazines'], false );
-		}
-		if ( in_array( 'up_snacks', $this->profile_visible_fields ) ) {
-			$interests_output .= $this->getProfileSection( wfMessage( 'other-info-snacks' )->escaped(), $profile_data['snacks'], false );
-		}
-		if ( in_array( 'up_drinks', $this->profile_visible_fields ) ) {
-			$interests_output .= $this->getProfileSection( wfMessage( 'other-info-drinks' )->escaped(), $profile_data['drinks'], false );
+			$interests_output .= $this->getProfileSection( wfMessage( 'user-profile-personal-worst-moment' )->escaped(), $profile_data['worstMoment'], false );
 		}
 
 		$output = '';
 		if ( $joined_data ) {
 			$output .= '<div class="user-section-heading">
 				<div class="user-section-title">' .
-					wfMessage( 'other-info-title' )->escaped() .
+					wfMessage( 'user-personal-biography-title' )->escaped() .
 				'</div>
 				<div class="user-section-actions">
 					<div class="action-right">';
@@ -475,6 +420,120 @@ class UserProfilePage extends Article {
 		}
 		return $output;
 	}
+
+
+	/**
+	 * Get the Social Media Accounts for a given user
+	 *
+	 * @return string HTML
+	 */
+	function getAccountLinks() {
+		global $wgUserProfileDisplay;
+
+		if ( $wgUserProfileDisplay['accountlinks'] == false ) {
+			return '';
+		}
+
+		$this->initializeProfileData();
+
+		$profile_data = $this->profile_data;
+		$joined_data = $profile_data['friendcode'] . $profile_data['steam'] . 
+				$profile_data['xbox'] . $profile_data['twitter'] . 
+				$profile_data['mastodon'] . $profile_data['instagram'] . 
+				$profile_data['discord '] . $profile_data['irc'] . 
+				$profile_data['reddit'] . $profile_data['twitch'] . 
+				$profile_data['youtube'] . $profile_data['rumble'] . 
+				$profile_data['bitchute'];
+
+
+		$edit_info_link = SpecialPage::getTitleFor( 'UpdateProfile' );
+
+		$interests_output = '';
+
+		if ( in_array( 'up_about', $this->profile_visible_fields ) ) {
+			$personal_output .= $this->getProfileSection( wfMessage( 'account-links-friendcode' )->escaped(), $profile_data['friendcode'], false );
+		}
+		if ( in_array( 'up_movies', $this->profile_visible_fields ) ) {
+			$interests_output .= $this->getProfileSection( wfMessage( 'account-links-steam' )->escaped(), $profile_data['steam'], false );
+		}
+		if ( in_array( 'up_tv', $this->profile_visible_fields ) ) {
+			$interests_output .= $this->getProfileSection( wfMessage( 'account-links-xbox' )->escaped(), $profile_data['xbox'], false );
+		}
+		if ( in_array( 'up_music', $this->profile_visible_fields ) ) {
+			$interests_output .= $this->getProfileSection( wfMessage( 'account-links-twitter' )->escaped(), $profile_data['twitter'], false );
+		}
+		if ( in_array( 'up_books', $this->profile_visible_fields ) ) {
+			$interests_output .= $this->getProfileSection( wfMessage( 'account-links-mastodon' )->escaped(), $profile_data['mastodon'], false );
+		}
+		if ( in_array( 'up_video_games', $this->profile_visible_fields ) ) {
+			$interests_output .= $this->getProfileSection( wfMessage( 'account-links-instagram' )->escaped(), $profile_data['instagram'], false );
+		}
+		if ( in_array( 'up_about', $this->profile_visible_fields ) ) {
+			$personal_output .= $this->getProfileSection( wfMessage( 'account-links-discord' )->escaped(), $profile_data['discord'], false );
+		}
+		if ( in_array( 'up_movies', $this->profile_visible_fields ) ) {
+			$interests_output .= $this->getProfileSection( wfMessage( 'account-links-irc' )->escaped(), $profile_data['irc'], false );
+		}
+		if ( in_array( 'up_tv', $this->profile_visible_fields ) ) {
+			$interests_output .= $this->getProfileSection( wfMessage( 'account-links-reddit' )->escaped(), $profile_data['reddit'], false );
+		}
+		if ( in_array( 'up_music', $this->profile_visible_fields ) ) {
+			$interests_output .= $this->getProfileSection( wfMessage( 'account-links-twitch' )->escaped(), $profile_data['twitch'], false );
+		}
+		if ( in_array( 'up_music', $this->profile_visible_fields ) ) {
+			$interests_output .= $this->getProfileSection( wfMessage( 'account-links-youtube' )->escaped(), $profile_data['youtube'], false );
+		}
+		if ( in_array( 'up_books', $this->profile_visible_fields ) ) {
+			$interests_output .= $this->getProfileSection( wfMessage( 'account-links-rumble' )->escaped(), $profile_data['rumble'], false );
+		}
+		if ( in_array( 'up_video_games', $this->profile_visible_fields ) ) {
+			$interests_output .= $this->getProfileSection( wfMessage( 'account-links-bitchute' )->escaped(), $profile_data['bitchute'], false );
+		}
+
+
+		$output = '';
+		if ( $joined_data ) {
+			$output .= '<div class="user-section-heading">
+				<div class="user-section-title">' .
+					wfMessage( 'user-personal-accountlinks-title' )->escaped() .
+				'</div>
+				<div class="user-section-actions">
+					<div class="action-right">';
+			if ( $this->viewingUser->getName() == $this->profileOwner->getName() ) {
+				$output .= '<a href="' . htmlspecialchars( $edit_info_link->getFullURL() ) . '/personal">' .
+					wfMessage( 'user-edit-this' )->escaped() . '</a>';
+			}
+			$output .= '</div>
+					<div class="visualClear"></div>
+				</div>
+			</div>
+			<div class="visualClear"></div>
+			<div class="profile-info-container">' .
+				$interests_output .
+			'</div>';
+		} elseif ( $this->isOwner() ) {
+			$output .= '<div class="user-section-heading">
+				<div class="user-section-title">' .
+					wfMessage( 'other-info-title' )->escaped() .
+				'</div>
+				<div class="user-section-actions">
+					<div class="action-right">
+						<a href="' . htmlspecialchars( $edit_info_link->getFullURL() ) . '/personal">' .
+							wfMessage( 'user-edit-this' )->escaped() .
+						'</a>
+					</div>
+					<div class="visualClear"></div>
+				</div>
+			</div>
+			<div class="visualClear"></div>
+			<div class="no-info-container">' .
+				wfMessage( 'other-no-info' )->escaped() .
+			'</div>';
+		}
+		return $output;
+	}
+
+
 
 	/**
 	 * Get the header for the social profile page, which includes the user's
