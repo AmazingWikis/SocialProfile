@@ -11,6 +11,25 @@ use MediaWiki\User\UserIdentity;
  * @license GPL-2.0-or-later
  */
 
+/*
+	public function deleteUserProfile( $up_id ) {
+		$dbw = wfGetDB( DB_MASTER );
+		$getRow = $dbw->selectRow(
+			'user_profile',
+			[ 'up_actor' ],
+			[ 'up_actor' => $up_id ],
+			__METHOD__
+		);
+		if ( $getRow !== false ) {
+			$dbw->delete(
+				'user_profile',
+				[ 'up_actor' => $up_id ],
+				__METHOD__
+			);
+		}
+	}
+
+*/
 class SpecialEditProfile extends SpecialUpdateProfile {
 
 	public function __construct() {

@@ -31,7 +31,7 @@ $wgUserProfileThresholds = [
 $wgUserPageChoice = true;
 
 $wgUserProfileDisplay['board'] = true;
-$wgUserProfileDisplay['activity'] = true; // Display recent social activity?
+$wgUserProfileDisplay['activity'] = true; // Display recent social activity
 $wgUserProfileDisplay['profile'] = true;
 $wgUserProfileDisplay['personal'] = true;
 $wgUserProfileDisplay['biography'] = true;

@@ -285,7 +285,7 @@ class UserProfilePage extends Article {
 		}
 
 		if ( in_array( 'up_occupation', $this->profile_visible_fields ) ) {
-			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-joindate' )->escaped(), $profile_data['occupation'], false );
+			$personal_output .= $this->getProfileSection( wfMessage( 'user-personal-info-joindate' )->escaped(), $profile_data['joindate'], false );
 		}
 
 		if ( in_array( 'up_websites', $this->profile_visible_fields ) ) {
@@ -315,7 +315,7 @@ class UserProfilePage extends Article {
 		} elseif ( $this->viewingUser->getName() == $this->profileOwner->getName() ) {
 			$output .= '<div class="user-section-heading">
 				<div class="user-section-title">' .
-					wfMessage( 'user-personal-info-title' )->escaped() .
+					wfMessage( 'user-personal-basicinfo-title' )->escaped() .
 				'</div>
 				<div class="user-section-actions">
 					<div class="action-right">

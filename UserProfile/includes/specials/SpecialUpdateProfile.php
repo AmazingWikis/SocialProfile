@@ -225,7 +225,7 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 		return $birthday_date;
 	}
 
-	// WHY DOES THIS DUPLICATION EXIST???? Don't remove it
+	// WHY DOES THIS DUPLICATION EXIST???? Don't remove it [Amazing Wikis]
 	public static function formatBirthday( $birthday, $showYOB = false ) {
 		$dob = explode( '-', $birthday );
 		if ( count( $dob ) == 3 ) {
@@ -259,12 +259,8 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 		$basicProfileData = [
 			'up_location_country' => $request->getVal( 'location_country' ) ?? '',
 			'up_birthday' => self::formatBirthdayDB( $request->getVal( 'birthday' ) ),
-			'up_about' => $request->getVal( 'about' ) ?? '',
-			'up_occupation' => $request->getVal( 'occupation' ) ?? '',
-			'up_schools' => $request->getVal( 'schools' ) ?? '',
-			'up_places_lived' => $request->getVal( 'places' ) ?? '',
-			'up_websites' => $request->getVal( 'websites' ) ?? '',
-			'up_relationship' => $request->getVal( 'relationship' ) ?? 0
+			'up_joindate' => self::formatBirthdayDB( $request->getVal( 'joindate' ) ),
+			'up_websites' => $request->getVal( 'websites' )
 		];
 
 		$dbw->update(
@@ -284,8 +280,7 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 
 
 	/**
-	 * Save the user's personal info (interests, such as favorite music or
-	 * TV programs or video games, etc.) into the database.
+	 * Save the user's biography into the database.
 	 *
 	 * @param UserIdentity|null $user
 	 */
@@ -299,16 +294,59 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 
 		$dbw = wfGetDB( DB_MASTER );
 
+		$biographyData = [
+			'up_about' => $request->getVal( 'about' ),
+			'up_hobbies' => $request->getVal( 'hobbies' ),
+			'up_bestMoment' => $request->getVal( 'bestMoment' ),
+			'up_favoriteCharacter ' => $request->getVal( 'favoriteCharacter' ),
+			'up_favoriteItem' => $request->getVal( 'favoriteItem' ),
+			'up_worstMoment' => $request->getVal( 'worstMoment' )
+		];
+
+		$dbw->update(
+			'user_profile',
+			/* SET */$biographyData,
+			/* WHERE */[ 'up_actor' => $user->getActorId() ],
+			__METHOD__
+		);
+
+		// PersonalAccountLinksChanged hook
+		Hooks::run( 'PersonalInterestsChanged', [ $user, $accountLinksData ] );
+		// end of the hook
+
+		UserProfile::clearCache( $user );
+	}
+
+
+	/**
+	 * Save the user's social media accounts into the database.
+	 *
+	 * @param UserIdentity|null $user
+	 */
+	function saveProfileAccountLinks( $user = null ) {
+		if ( $user === null ) {
+			$user = $this->getUser();
+		}
+
+		$this->initProfile( $user );
+		$request = $this->getRequest();
+
+		$dbw = wfGetDB( DB_MASTER );
+
 		$accountLinksData = [
-			'up_companies' => $request->getVal( 'companies' ),
-			'up_movies' => $request->getVal( 'movies' ),
-			'up_music' => $request->getVal( 'music' ),
-			'up_tv' => $request->getVal( 'tv' ),
-			'up_books' => $request->getVal( 'books' ),
-			'up_magazines' => $request->getVal( 'magazines' ),
-			'up_video_games' => $request->getVal( 'videogames' ),
-			'up_snacks' => $request->getVal( 'snacks' ),
-			'up_drinks' => $request->getVal( 'drinks' )
+			'up_friendcode' => $request->getVal( 'friendcode' ),
+			'up_steam' => $request->getVal( 'steam' ),
+			'up_xbox' => $request->getVal( 'xbox' ),
+			'up_twitter' => $request->getVal( 'twitter' ),
+			'up_mastodon' => $request->getVal( 'mastodon' ),
+			'up_instagram' => $request->getVal( 'instagram' ),
+			'up_discord ' => $request->getVal( 'discord ' ),
+			'up_irc' => $request->getVal( 'irc' ),
+			'up_reddit' => $request->getVal( 'reddit' ),
+			'up_twitch' => $request->getVal( 'twitch' ),
+			'up_youtube' => $request->getVal( 'youtube' ),
+			'up_rumble' => $request->getVal( 'rumble' ),
+			'up_bitchute' => $request->getVal( 'bitchute' )
 		];
 
 		$dbw->update(
@@ -324,6 +362,8 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 
 		UserProfile::clearCache( $user );
 	}
+
+
 
 	/**
 	 * @param User $user

@@ -14,3 +14,25 @@ CREATE TABLE IF NOT EXISTS /*_*/user_board (
 CREATE INDEX /*i*/ub_actor ON      /*_*/user_board (ub_actor);
 CREATE INDEX /*i*/ub_actor_from ON /*_*/user_board (ub_actor_from);
 CREATE INDEX /*i*/ub_type ON       /*_*/user_board (ub_type);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -40,29 +40,30 @@ class UserProfile {
 	 * @see https://phabricator.wikimedia.org/T212290
 	 */
 	public $profile_fields = [
-		'real_name',
-		'location_city',
-		'hometown_city',
-		'hometown_country',
+		'name', 
+		'location_country', 
 		'birthday',
-		'about',
-		'places_lived',
+		'joindate',
 		'websites',
-		'hobby',
-		'schools',
-		'movies',
-		'tv',
-		'music',
-		'books',
-		'magazines',
-		'video_games',
-		'snacks',
-		'drinks',
-		'custom_1',
-		'custom_2',
-		'custom_3',
-		'custom_4',
-		'email'
+		'about',
+		'hobby', 
+		'bestMoment', 
+		'favoriteCharacter', 
+		'favoriteItem', 
+		'worstMoment', 
+		'friendcode', 
+		'steam', 
+		'xbox', 
+		'twitter', 
+		'mastodon', 
+		'instagram', 
+		'discord ', 
+		'irc', 
+		'reddit', 
+		'twitch', 
+		'youtube', 
+		'rumble', 
+		'bitchute'
 	];
 
 	/**
@@ -152,39 +153,34 @@ class UserProfile {
 			//$showYOJ = $userOptionsLookup->getIntOption( $this->user, 'showyearofjoin', !isset( $row->up_join ) ) == 1;
 			//$issetUpjoin = $row->up_join ?? '';
 
-			$profile['location_city'] = $row->up_location_city ?? '';
-			$profile['location_state'] = $row->up_location_state ?? '';
 			$profile['location_country'] = $row->up_location_country ?? '';
-			$profile['hometown_city'] = $row->up_hometown_city ?? '';
-			$profile['hometown_state'] = $row->up_hometown_state ?? '';
-			$profile['hometown_country'] = $row->up_hometown_country ?? '';
 			$profile['birthday'] = $this->formatBirthday( $issetUpBirthday, $showYOB );
-
-			$profile['about'] = $row->up_about ?? '';
-			$profile['places_lived'] = $row->up_places_lived ?? '';
+			//$profile['joindate'] = $this->formatBirthday( $issetUpJoin, $showYOJ );
+			$profile['name'] = $row->up_name ?? '';
 			$profile['websites'] = $row->up_websites ?? '';
-			$profile['relationship'] = $row->up_relationship ?? '';
-			$profile['hobby'] = $row->up_hobby?? '';
-			$profile['schools'] = $row->up_schools ?? '';
-			$profile['movies'] = $row->up_movies ?? '';
-			$profile['music'] = $row->up_music ?? '';
-			$profile['tv'] = $row->up_tv ?? '';
-			$profile['books'] = $row->up_books ?? '';
-			$profile['magazines'] = $row->up_magazines ?? '';
-			$profile['video_games'] = $row->up_video_games ?? '';
-			$profile['snacks'] = $row->up_snacks ?? '';
-			$profile['drinks'] = $row->up_drinks ?? '';
-			$profile['custom_1'] = $row->up_custom_1 ?? '';
-			$profile['custom_2'] = $row->up_custom_2 ?? '';
-			$profile['custom_3'] = $row->up_custom_3 ?? '';
-			$profile['custom_4'] = $row->up_custom_4 ?? '';
-			$profile['custom_5'] = $row->up_custom_5 ?? '';
+			$profile['about'] = $row->up_about ?? '';
+			$profile['hobby'] = $row->up_hobby ?? '';
+			$profile['bestMoment'] = $row->up_bestMoment ?? '';
+			$profile['favoriteCharacter'] = $row->up_favoriteCharacter ?? '';
+			$profile['favoriteItem'] = $row->up_favoriteItem ?? '';
+			$profile['worstMoment'] = $row->up_worstMoment ?? '';
+			$profile['friendcode'] = $row->up_friendcode ?? '';
+			$profile['steam'] = $row->up_steam ?? '';
+			$profile['xbox'] = $row->up_xbox ?? '';
+			$profile['mastodon'] = $row->up_mastodon ?? '';
+			$profile['instagram'] = $row->up_instagram ?? '';
+			$profile['discord '] = $row->up_discord ?? '';
+			$profile['irc'] = $row->up_irc ?? '';
+			$profile['reddit'] = $row->up_reddit ?? '';
+			$profile['twitch'] = $row->up_twitch ?? '';
+			$profile['youtube'] = $row->up_youtube ?? '';
+			$profile['rumble'] = $row->up_rumble ?? '';
+			$profile['bitchute'] = $row->up_bitchute?? '';
 			$profile['user_page_type'] = $row->up_type ?? '';
 			$cache->set( $key, $profile );
 		}
 
-		$profile['real_name'] = $this->user->getRealName();
-		$profile['email'] = $this->user->getEmail();
+		//$profile['real_name'] = $this->user->getRealName();
 
 		return $profile;
 	}

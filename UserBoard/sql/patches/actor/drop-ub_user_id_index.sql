@@ -1,1 +1,0 @@
-DROP INDEX /*i*/ub_user_id ON /*_*/user_board;

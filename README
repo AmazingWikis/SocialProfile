@@ -1,11 +1,13 @@
 This is the readme file for SocialProfile extension.
 
 ==Changes Made==
-* User Welcome, User Gifts, System Gifts, User Stats, Relationship were removed
-* User Profile and User Activity were gutted for GDPR compliance
-* Unused assets were deleted
-* SQL tables were cleaned up and patched integrated
+* There originally were 8 extensions integrated, 5 were removed on request. Extensions removed: User Welcome, User Gifts, System Gifts, User Stats, Relationship.
+* User Profile and User Activity were gutted for CCPA & GDPR compliance, possibly non-functional dead code exists & requires additional clean up
+* Unused social assets were removed
+* SQL tables were cleaned up and all patches integrated into sql files
 * User Profile fields were adjusted
+* User Profile layout was changed to mirror Halopedia's 2 column design
+* maintenance scripts were added: dropping all SocialProfile tables, blank a user profile page
 
 ==Intro==
 SocialProfile extension provides a user profile that includes user activity and user-to-user messages into your MediaWiki. For a complete feature listing
@@ -19,7 +21,7 @@ SocialProfile was written by David Pean and Aaron Wright for Wikia, Inc.
 
 It has been maintained by Jack Phoenix since 2008.
 
-Modified by Amazing Wikis Org in October 2022.
+Modified by Amazing Wikis Org since October 2022.
 
 ==License==
 SocialProfile is licensed under GNU General Public License 2.0 or later.

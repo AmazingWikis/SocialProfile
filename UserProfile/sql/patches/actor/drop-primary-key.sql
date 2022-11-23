@@ -1,1 +1,0 @@
-ALTER TABLE /*_*/user_profile DROP PRIMARY KEY;
