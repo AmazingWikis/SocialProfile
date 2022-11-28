@@ -407,7 +407,7 @@ class SpecialUpdateProfile extends UnlistedSpecialPage {
 
 		$this->getOutput()->setPageTitle( $this->msg( 'edit-profile-title' )->escaped() );
 
-		$form = UserProfile::getEditProfileNav( $this->msg( 'user-profile-section-biography' )->escaped() );
+		$form = UserProfile::getEditProfileNav( $this->msg( 'user-personal-biography-title' )->escaped() );
 		$form .= '<form action="" method="post" enctype="multipart/form-data" name="profile">';
 		// NoJS thing -- JS sets this to false, which means that in execute() we skip updating
 		// profile field visibilities for users with JS enabled can do and have already done that

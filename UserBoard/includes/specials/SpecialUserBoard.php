@@ -36,11 +36,6 @@ class SpecialViewUserBoard extends SpecialPage {
 		return (bool)$this->getUser()->isRegistered();
 	}
 
-	$currentUser = $this->getUser();
-	if ( $currentUser ->getBlock() ) {
-            throw new UserBlockedError( $currentUser->getBlock() );
-        }
-
 	/**
 	 * Show the special page
 	 *

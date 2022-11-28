@@ -154,7 +154,7 @@ class UserProfilePage extends Article {
 
 		$out->addHTML( $this->getPersonalInfo() );
 
-		$out->addHTML( $this->getAccountLinks() );
+		$out->addHTML( $this->getBiography() );
 
 		// @phan-suppress-next-line SecurityCheck-XSS
 		$out->addHTML( $this->getActivity() );
@@ -178,7 +178,8 @@ class UserProfilePage extends Article {
 			] );
 		}
 
-		$out->addHTML( $this->getBiography() );
+
+		$out->addHTML( $this->getAccountLinks() );
 
 		$out->addHTML( $this->getUserBoard( $context->getUser() ) );
 
@@ -402,7 +403,7 @@ class UserProfilePage extends Article {
 		} elseif ( $this->isOwner() ) {
 			$output .= '<div class="user-section-heading">
 				<div class="user-section-title">' .
-					wfMessage( 'other-info-title' )->escaped() .
+					wfMessage( 'user-personal-accountlinks-title' )->escaped() .
 				'</div>
 				<div class="user-section-actions">
 					<div class="action-right">
@@ -514,7 +515,7 @@ class UserProfilePage extends Article {
 		} elseif ( $this->isOwner() ) {
 			$output .= '<div class="user-section-heading">
 				<div class="user-section-title">' .
-					wfMessage( 'other-info-title' )->escaped() .
+					wfMessage( 'user-personal-biography-title' )->escaped() .
 				'</div>
 				<div class="user-section-actions">
 					<div class="action-right">

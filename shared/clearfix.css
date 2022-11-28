@@ -6,7 +6,6 @@
 	visibility: hidden;
 }
 
-.clearfix { display: inline-block; }
-
-/* Monaco is different */
-.skin-monaco .clearfix { display: block; }
+.clearfix {
+	display: inline-block;
+}
