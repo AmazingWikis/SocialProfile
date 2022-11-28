@@ -12,14 +12,22 @@
 	padding: 0 !important;
 }
 
+.mw-body {
+	height: 120%;
+}
+
 #user-page-left {
-	width: 35%;
-	float: left;
+	height: 100%;
+	left: 0;
+	position: absolute;
+	width: 48% !important;
+	float: left !important;
 }
 
 #user-page-right {
-	float: right;
-	width: 60%;
+	height: 100%;
+	width: 48% !important;
+	float: right !important;
 }
 
 #user-page-left h2, #user-page-right h2 {
@@ -84,7 +92,7 @@
 #profile-top {
 	border-bottom: 1px solid #d4dfd7;
 	padding: 10px 0;
-	margin: 0 0 10px 0;
+	margin: 0 0 50px 0;
 	position: relative;
 }
 
@@ -113,31 +121,6 @@
 	margin: 0 15px 0 0;
 }
 
-#points-level {
-	background-color: #c00;
-	font-size: 11px;
-	text-align: center;
-	float: left;
-	padding: 1px 5px;
-	margin: 4px 8px 0 0;
-}
-
-#honorific-level {
-	font-size: 12px;
-	float: left;
-	margin: 4px 0 0 0;
-}
-
-#honorific-level a {
-	text-decoration: none;
-}
-
-#points-level a {
-	color: #fff;
-	font-weight: 700;
-	text-decoration: none;
-}
-
 #profile-image {
 	float: left;
 	margin: 0 8px 0 0;
@@ -159,6 +142,7 @@
 
 #profile-right {
 	float: left;
+	width: 100%;
 	position: relative;
 }
 
@@ -166,47 +150,6 @@
 	text-decoration: none;
 	font-weight: 700;
 	margin: 0 6px;
-}
-
-/* User-Relationship */
-.user-relationship-container {
-	padding: 0 0 25px 0;
-}
-
-.user-relationship-container a {
-	text-decoration: none;
-	float: left;
-	margin: 5px 10px 0 0;
-	display: block;
-}
-
-.user-relationship-container img {
-	background-color: #fff;
-	border: 1px solid #dcdcdc;
-	padding: 3px;
-}
-
-/* User Gift / User Awards */
-.user-gift-container {
-	padding: 0 0 25px 0;
-}
-
-.user-gift-container a {
-	text-decoration: none;
-	display: block;
-	float: left;
-	margin: 5px 10px 0 0;
-}
-
-.user-gift-container img {
-	background-color: #fff;
-	border: 1px solid #dcdcdc;
-	padding: 3px;
-}
-
-/* Fanboxes */
-.user-fanbox-container {
-	padding: 0 0 25px 0;
 }
 
 /* User Activity */
@@ -332,39 +275,6 @@
 	margin: 0 5px 0 0 !important;
 }
 
-/* Casual Games */
-.casual-game-container {
-	padding: 0 0 18px 0;
-}
-
-.casual-game-container p {
-	border-top: 1px solid #dcdcdc;
-	padding: 7px 0 !important;
-	margin: 0 !important;
-}
-
-.casual-game-container .item-top {
-	border: 0;
-}
-
-.casual-game-container a {
-	font-weight: 700;
-	text-decoration: none;
-}
-
-.casual-game-container .item-type {
-	font-size: 9px;
-	margin: 0 0 0 6px;
-}
-
-.casual-game-container img {
-	border: 1px solid #dcdcdc;
-	padding: 3px;
-	background-color: #fff;
-	vertical-align: middle;
-	margin: 0 3px 0 0;
-}
-
 /* User Articles */
 .user-articles-container {
 	padding: 0 0 23px 0;
@@ -385,51 +295,6 @@
 	margin: 0;
 	padding: 7px 0 2px 0;
 	border: none;
-}
-
-.number-of-votes {
-	margin: 0 10px 3px 0;
-	text-align: center;
-	float: left;
-	width: 25px;
-}
-
-.vote-number {
-	background-color: #89c46f;
-	color: #fff;
-	font-size: 12px !important;
-	margin: 0 0 2px 0;
-	font-weight: 700;
-	height: 25px;
-	line-height: 25px;
-}
-
-.vote-text {
-	color: #777;
-	font-size: 9px;
-	line-height: 9px;
-	margin: -1px 0 0 0;
-}
-
-/* Pictures */
-.picture-container-spacer {
-	height: 25px;
-	width: 100%;
-}
-
-.picture-container .mini-image {
-	float: left;
-	margin: 5px 10px 0 0;
-}
-
-.picture-container img {
-	background-color: #fff;
-	border: 1px solid #dcdcdc;
-	padding: 3px;
-}
-
-.picture-container a {
-	text-decoration: none;
 }
 
 .upload-container {
