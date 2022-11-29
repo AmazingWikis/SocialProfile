@@ -58,9 +58,6 @@ class UserActivity {
 		if ( strtoupper( $filter ) == 'USER' ) {
 			$this->show_current_user = true;
 		}
-		/*if ( strtoupper( $filter ) == 'FRIENDS' ) {
-			$this->rel_type = 1;
-		}*/
 		if ( strtoupper( $filter ) == 'ALL' ) {
 			$this->show_all = true;
 		}
@@ -182,7 +179,7 @@ class UserActivity {
 		$dbr = wfGetDB( DB_REPLICA );
 
 		$where = [];
-		// We do *not* want to display private messages...
+
 		$where['ub_type'] = UserBoard::MESSAGE_PUBLIC;
 
 		if ( !empty( $this->rel_type ) ) {
@@ -424,8 +421,7 @@ class UserActivity {
 				$this->activityLines[] = [
 					'type' => $type,
 					'timestamp' => $page_data['timestamp'],
-					// For grep: useractivity-edit, useractivity-foe, useractivity-friend,
-					// useractivity-gift, useractivity-user_message, useractivity-comment
+					// For grep: useractivity-edit, 
 					// @phan-suppress-next-line SecurityCheck-XSS Somewhat false alarm as per the comment below
 					'data' => wfMessage( "useractivity-{$type}" )->rawParams(
 						$users, $count_users, $pages, $pages_count,
@@ -449,10 +445,6 @@ class UserActivity {
 		switch ( $type ) {
 			case 'edit':
 				return 'editIcon.gif';
-			case 'comment':
-				return 'comment.gif';
-			case 'friend':
-				return 'addedFriendIcon.png';
 			case 'system_message':
 				return 'challengeIcon.png';
 			case 'user_message':

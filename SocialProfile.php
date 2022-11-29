@@ -102,20 +102,19 @@ $wgExtensionCredits['other'][] = [
 	'path' => __FILE__,
 	'name' => 'SocialProfile',
 	'author' => [ 'Aaron Wright', 'David Pean', 'Jack Phoenix' ],
-	'version' => '1.14',
+	'version' => '1.20',
 	'url' => 'https://www.mediawiki.org/wiki/Extension:SocialProfile',
 	'descriptionmsg' => 'socialprofile-desc',
 ];
 
-// Hooked functions
-$wgAutoloadClasses['SocialProfileHooks'] = __DIR__ . '/SocialProfileHooks.php';
+// Hook functions
+$wgAutoloadClasses['SocialProfileHooks'] = __DIR__ . '/Hooks/SocialProfileHooks.php';
 
 // Loader files
 require_once __DIR__ . '/UserProfile/UserProfile.php'; // Profile page configuration loader file
 wfLoadExtensions( [
-	'SocialProfile/UserActivity', // UserActivity - recent social changes
-	'SocialProfile/UserBoard',
-
+	'SocialProfile/UserActivity', // user's activity
+	'SocialProfile/UserBoard'
 ] );
 
 $wgHooks['BeforePageDisplay'][] = 'SocialProfileHooks::onBeforePageDisplay';

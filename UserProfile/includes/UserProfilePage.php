@@ -158,6 +158,9 @@ class UserProfilePage extends Article {
 
 		$out->addHTML( $this->getAccountLinks() );
 
+		// @phan-suppress-next-line SecurityCheck-XSS
+		$out->addHTML( $this->getActivity() );
+
 		if ( !Hooks::run( 'UserProfileEndLeft', [ &$userProfilePage ] ) ) {
 			$logger->debug( "{method}: UserProfileEndLeft messed up profile!\n", [
 				'method' => __METHOD__
@@ -177,12 +180,8 @@ class UserProfilePage extends Article {
 			] );
 		}
 
-
-
 		$out->addHTML( $this->getUserBoard( $context->getUser() ) );
 
-		// @phan-suppress-next-line SecurityCheck-XSS
-		$out->addHTML( $this->getActivity() );
 
 		if ( !Hooks::run( 'UserProfileEndRight', [ &$userProfilePage ] ) ) {
 			$logger->debug( "{method}: UserProfileEndRight messed up profile!\n", [
@@ -706,7 +705,7 @@ class UserProfilePage extends Article {
 
 		$output = '';
 
-		$limit = 8;
+		$limit = 10;
 		$rel = new UserActivity( $this->profileOwner, 'user', $limit );
 
 		/**

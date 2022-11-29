@@ -45,8 +45,7 @@ class UserHome extends SpecialPage {
 		// Initialize all of these or otherwise we get a lot of E_NOTICEs about
 		// undefined variables when the filtering feature (described below) is
 		// active and we're viewing a filtered-down feed
-		$edits = $votes = $comments = $comments = $gifts = $relationships =
-			$messages = $system_gifts = $messages_sent = $network_updates = 0;
+		$edits = $messages = $messages_sent = 0;
 
 		$rel_type = $request->getVal( 'rel_type' );
 		$item_type = $request->getVal( 'item_type' );
@@ -120,13 +119,9 @@ class UserHome extends SpecialPage {
 			</div>';
 		}*/
 
-		//$output .= '<div class="user-home-feed">';
+		$output .= '<div class="user-home-feed">';
 
-		$rel = new UserActivity( $user, ( ( $rel_type == 1 ) ? ' friends' : 'foes' ), 50 );
 		$rel->setActivityToggle( 'show_edits', $edits );
-		//$rel->setActivityToggle( 'show_comments', $comments );
-		//$rel->setActivityToggle( 'show_relationships', $relationships );
-		//$rel->setActivityToggle( 'show_system_messages', $messages );
 		$rel->setActivityToggle( 'show_messages_sent', $messages_sent );
 
 		/**

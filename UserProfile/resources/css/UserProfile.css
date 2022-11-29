@@ -12,8 +12,8 @@
 	padding: 0 !important;
 }
 
-.mw-body {
-	height: 120%;
+#mw-content-text.mw-body-content mw-content-ltr {
+	height: 200%;
 }
 
 #user-page-left {

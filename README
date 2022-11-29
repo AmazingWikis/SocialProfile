@@ -3,14 +3,17 @@ This is the readme file for SocialProfile extension.
 ==Changes Made==
 * There originally were 8 extensions integrated, 5 were removed on request. Extensions removed: User Welcome, User Gifts, System Gifts, User Stats, Relationship.
 * User Profile and User Activity were gutted for CCPA & GDPR compliance, possibly non-functional dead code exists & requires additional clean up
+* DM feature was removed from User Board to avoid CCPA and GDPR legal violations
 * Unused social assets were removed
 * SQL tables were cleaned up and all patches integrated into sql files
 * User Profile fields were adjusted
 * User Profile layout was changed to mirror Halopedia's 2 column design
 * maintenance scripts were added: dropping all SocialProfile tables, blank a user profile page
 
+CONFIGURATIONS
+set display limit of user activity using $limit under function getActivity() [UserProfilePage.php]
 
-Configuring custom fields for User Profile, alter the fields located at UserProfile/i18n/en.json
+Configuring custom fields display names for User Profile, alter these at UserProfile/i18n/en.json
 	"user-profile-personal-best-moment": "Best moment?",
 	"user-profile-personal-favorite-character": "Favorite Character?",
 	"user-profile-personal-favorite-item": "Favorite Item?",
