@@ -397,9 +397,9 @@ class UserBoard {
 						wfMessage( 'delete' )->escaped() . '</a>
 				</span>';
 		}
-		if ( $message['type'] == 1 ) {
+		/*if ( $message['type'] == 1 ) {
 			$message_type_label = '(' . wfMessage( 'userboard_private' )->escaped() . ')';
-		}
+		}*/
 
 		$message_text = $message['message_text'];
 		# $message_text = preg_replace_callback( "/(<a[^>]*>)(.*?)(<\/a>)/i", 'cut_link_text', $message['message_text'] );

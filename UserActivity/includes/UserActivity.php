@@ -58,9 +58,9 @@ class UserActivity {
 		if ( strtoupper( $filter ) == 'USER' ) {
 			$this->show_current_user = true;
 		}
-		if ( strtoupper( $filter ) == 'FRIENDS' ) {
+		/*if ( strtoupper( $filter ) == 'FRIENDS' ) {
 			$this->rel_type = 1;
-		}
+		}*/
 		if ( strtoupper( $filter ) == 'ALL' ) {
 			$this->show_all = true;
 		}

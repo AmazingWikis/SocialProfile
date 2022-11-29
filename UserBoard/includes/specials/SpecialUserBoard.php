@@ -311,7 +311,6 @@ class SpecialViewUserBoard extends SpecialPage {
 					<span class="user-board-message-type">' . $this->msg( 'userboard_messagetype' )->escaped() . ' </span>
 					<select id="message_type" name="message_type">
 						<option value="0">' . $this->msg( 'userboard_public' )->escaped() . '</option>
-						<option value="1">' . $this->msg( 'userboard_private' )->escaped() . '</option>
 					</select>
 					<p>
 					<textarea name="message" id="message" cols="63" rows="4"></textarea>
@@ -370,7 +369,7 @@ class SpecialViewUserBoard extends SpecialPage {
 
 				// If the user owns this private message or they are allowed to
 				// delete board messages, show the "delete" link to them
-				if (
+				/*if (
 					$currentUser->getActorId() == $ub_message['ub_actor'] ||
 					$currentUser->isAllowed( 'userboard-delete' )
 				) {
@@ -392,12 +391,7 @@ class SpecialViewUserBoard extends SpecialPage {
 						<a href=\"{$deleteURL}\" data-message-id=\"{$ub_message['id']}\">" .
 							$this->msg( 'delete' )->escaped() . '</a>
 					</span>';
-				}
-
-				// Mark private messages as such
-				if ( $ub_message['type'] == 1 ) {
-					$ub_message_type_label = '(' . $this->msg( 'userboard_private' )->escaped() . ')';
-				}
+				}*/
 
 				// had global function to cut link text if too long and no breaks
 				// $ub_message_text = preg_replace_callback( "/(<a[^>]*>)(.*?)(<\/a>)/i", 'cut_link_text', $ub_message['message_text'] );

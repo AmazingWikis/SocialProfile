@@ -156,8 +156,7 @@ class UserProfilePage extends Article {
 
 		$out->addHTML( $this->getBiography() );
 
-		// @phan-suppress-next-line SecurityCheck-XSS
-		$out->addHTML( $this->getActivity() );
+		$out->addHTML( $this->getAccountLinks() );
 
 		if ( !Hooks::run( 'UserProfileEndLeft', [ &$userProfilePage ] ) ) {
 			$logger->debug( "{method}: UserProfileEndLeft messed up profile!\n", [
@@ -179,10 +178,11 @@ class UserProfilePage extends Article {
 		}
 
 
-		$out->addHTML( $this->getAccountLinks() );
 
 		$out->addHTML( $this->getUserBoard( $context->getUser() ) );
 
+		// @phan-suppress-next-line SecurityCheck-XSS
+		$out->addHTML( $this->getActivity() );
 
 		if ( !Hooks::run( 'UserProfileEndRight', [ &$userProfilePage ] ) ) {
 			$logger->debug( "{method}: UserProfileEndRight messed up profile!\n", [
@@ -883,9 +883,6 @@ class UserProfilePage extends Article {
 						<select id="message_type" name="message_type">
 							<option value="0">' .
 								wfMessage( 'userboard_public' )->escaped() .
-							'</option>
-							<option value="1">' .
-								wfMessage( 'userboard_private' )->escaped() .
 							'</option>
 						</select><p>
 						<textarea name="message" id="message" cols="43" rows="4"></textarea>

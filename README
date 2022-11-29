@@ -9,6 +9,14 @@ This is the readme file for SocialProfile extension.
 * User Profile layout was changed to mirror Halopedia's 2 column design
 * maintenance scripts were added: dropping all SocialProfile tables, blank a user profile page
 
+
+Configuring custom fields for User Profile, alter the fields located at UserProfile/i18n/en.json
+	"user-profile-personal-best-moment": "Best moment?",
+	"user-profile-personal-favorite-character": "Favorite Character?",
+	"user-profile-personal-favorite-item": "Favorite Item?",
+	"user-profile-personal-worst-moment": "Worst moment?",
+
+
 ==Intro==
 SocialProfile extension provides a user profile that includes user activity and user-to-user messages into your MediaWiki. For a complete feature listing
 and up-to-date documentation about installing and using the software,
