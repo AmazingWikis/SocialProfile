@@ -705,7 +705,7 @@ class UserProfilePage extends Article {
 
 		$output = '';
 
-		$limit = 10;
+		$limit = 100;
 		$rel = new UserActivity( $this->profileOwner, 'user', $limit );
 
 		/**
@@ -849,6 +849,13 @@ class UserProfilePage extends Article {
 			'</div>
 			<div class="user-section-actions">
 				<div class="action-right">';
+		
+			$output .= '<a href="' .
+				htmlspecialchars(
+					SpecialPage::getTitleFor( 'UserBoard' )->getFullURL( [ 'user' => $this->profileOwner->getName() ] )
+				) . '">' .
+				wfMessage( 'user-view-all' )->escaped() . '</a>';
+
 		$output .= '</div>
 				<div class="action-left">';
 		if ( $total > 10 ) {

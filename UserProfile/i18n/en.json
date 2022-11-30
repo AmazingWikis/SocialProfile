@@ -10,7 +10,7 @@
 	"populateuserprofiles-confirm": "Are you sure you want to populate existing users' profiles?",
 	"user-time-ago": "$1 ago",
 	"user-count-separator": "$1 of $2",
-	"user-view-all": "View all",
+	"user-view-all": "View all messages",
 	"user-upload-image": "Upload image",
 	"user-edit-this": "Edit this",
 	"user-edit-profile": "Edit profile",
