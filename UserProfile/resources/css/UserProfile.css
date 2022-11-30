@@ -12,6 +12,10 @@
 	padding: 0 !important;
 }
 
+.mw-body {
+	height: 200%;
+}
+
 #mw-content-text.mw-body-content mw-content-ltr {
 	height: 200%;
 }
