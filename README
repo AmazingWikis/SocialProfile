@@ -1,5 +1,7 @@
 This is the readme file for SocialProfile extension.
 
+This is considered SocialProfile Version 2. A lot of features have been gutted out for legal reasons or remove unused social components. The goal is to split User Activity and User Boards into independent extensions. Further enhancements is planned for the extraction of User Activity and User Boards from SocialProfile.
+
 ==Changes Made==
 * There originally were 8 extensions integrated, 5 were removed on request. Extensions removed: User Welcome, User Gifts, System Gifts, User Stats, Relationship.
 * User Profile and User Activity were gutted for CCPA & GDPR compliance, possibly non-functional dead code exists & requires additional clean up
@@ -21,11 +23,7 @@ Configuring custom fields display names for User Profile, alter these at UserPro
 
 
 ==Intro==
-SocialProfile extension provides a user profile that includes user activity and user-to-user messages into your MediaWiki. For a complete feature listing
-and up-to-date documentation about installing and using the software,
-please see the extension's infopage on MediaWiki.org:
-
-https://www.mediawiki.org/wiki/Extension:SocialProfile
+SocialProfile extension provides a user profile that includes user activity and user-to-user messages into your MediaWiki. https://www.mediawiki.org/wiki/Extension:SocialProfile
 
 ==Authors==
 SocialProfile was written by David Pean and Aaron Wright for Wikia, Inc.
@@ -39,9 +37,7 @@ SocialProfile is licensed under GNU General Public License 2.0 or later.
 See http://www.gnu.org/copyleft/gpl.html for more details.
 
 ==Bugs==
-Bugs and issues should be reported on the MediaWiki Phabricator:
-
-https://phabricator.wikimedia.org/maniphest/task/create/?projects=MediaWiki-extensions-SocialProfile
+Bugs and issues should be reported at the forked public github repository: https://github.com/AmazingWikis/SocialProfile
 
 It is recommended that you spend a while reading the documentation and
 searching the archived discussions before posting a question - it is
