@@ -31,10 +31,9 @@ class UserBoardHooks {
 			// keys and the values of the array, by editing them
 			// separately and then rebuilding the array.
 			// based on the example at http://us2.php.net/manual/en/function.array-splice.php#31234
-			// NOTE: if AdminLinks is installed, change 'preferences' to 'adminlinks'
 			$tab_keys = array_keys( $personal_urls );
 			$tab_values = array_values( $personal_urls );
-			$new_location = array_search( 'preferences', $tab_keys );
+			$new_location = array_search( 'mytalk', $tab_keys );
 			array_splice( $tab_keys, $new_location, 0, 'userboard' );
 			array_splice( $tab_values, $new_location, 0, array( $userboard_links_vals ) );
 
