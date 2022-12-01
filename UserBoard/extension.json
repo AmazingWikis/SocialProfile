@@ -42,6 +42,9 @@
 		"SendBoardBlast": "SpecialBoardBlast",
 		"UserBoard": "SpecialViewUserBoard"
 	},
+	"Hooks": {
+		"PersonalUrls": "UserBoardHooks::addURLToUserLinks"
+	},
 	"ResourceModules": {
 		"ext.socialprofile.userboard.js": {
 			"scripts": "js/UserBoard.js",

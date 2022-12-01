@@ -6,6 +6,7 @@
 			"Purodha"
 		]
 	},
+	"userboard": "UserBoard",
 	"userboard-desc": "Allows for sending board-to-board messages",
 	"messagesenttitle": "Messages sent",
 	"boardblasttitle": "Send board blast",

@@ -45,7 +45,8 @@ class UserHome extends SpecialPage {
 		// Initialize all of these or otherwise we get a lot of E_NOTICEs about
 		// undefined variables when the filtering feature (described below) is
 		// active and we're viewing a filtered-down feed
-		$edits = $messages = $messages_sent = 0;
+		$edits = 0;
+		$messages_sent = 0;
 
 		$rel_type = $request->getVal( 'rel_type' );
 		$item_type = $request->getVal( 'item_type' );
