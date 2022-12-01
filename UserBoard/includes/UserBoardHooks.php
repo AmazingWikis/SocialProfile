@@ -16,31 +16,33 @@ class UserBoardHooks {
 		Title &$title,
 		SkinTemplate $skinTemplate
 	) {
-		$al = SpecialPage::getTitleFor( 'UserBoard' );
-		$href = $al->getLocalURL();
-		$userboard_links_vals = array(
-			'text' => $skinTemplate->msg( 'userboard' )->text(),
-			'href' => $href,
-			'active' => ( $href == $title->getLocalURL() )
-		);
+		if ( $skinTemplate->getUser()->isAllowed( 'edit' ) ) {
+			$ubl = SpecialPage::getTitleFor( 'UserBoard' );
+			$href = $ubl->getLocalURL();
+			$userboard_links_vals = array(
+				'text' => $skinTemplate->msg( 'userboard' )->text(),
+				'href' => $href,
+				'active' => ( $href == $title->getLocalURL() )
+			);
 
-		// find the location of the 'talk' link, and
-		// add the link to 'UserBoard' right before it.
-		// this is a "key-safe" splice - it preserves both the
-		// keys and the values of the array, by editing them
-		// separately and then rebuilding the array.
-		// based on the example at http://us2.php.net/manual/en/function.array-splice.php#31234
-		// NOTE: if AdminLinks is installed, change 'preferences' to 'adminlinks'
-		$tab_keys = array_keys( $personal_urls );
-		$tab_values = array_values( $personal_urls );
-		$new_location = array_search( 'preferences', $tab_keys );
-		array_splice( $tab_keys, $new_location, 0, 'userboard' );
-		array_splice( $tab_values, $new_location, 0, array( $userboard_links_vals ) );
+			// find the location of the 'talk' link, and
+			// add the link to 'UserBoard' right before it.
+			// this is a "key-safe" splice - it preserves both the
+			// keys and the values of the array, by editing them
+			// separately and then rebuilding the array.
+			// based on the example at http://us2.php.net/manual/en/function.array-splice.php#31234
+			// NOTE: if AdminLinks is installed, change 'preferences' to 'adminlinks'
+			$tab_keys = array_keys( $personal_urls );
+			$tab_values = array_values( $personal_urls );
+			$new_location = array_search( 'preferences', $tab_keys );
+			array_splice( $tab_keys, $new_location, 0, 'userboard' );
+			array_splice( $tab_values, $new_location, 0, array( $userboard_links_vals ) );
 
-		$personal_urls = array();
-		$tabKeysCount = count( $tab_keys );
-		for ( $i = 0; $i < $tabKeysCount; $i++ ) {
-			$personal_urls[$tab_keys[$i]] = $tab_values[$i];
+			$personal_urls = array();
+			$tabKeysCount = count( $tab_keys );
+			for ( $i = 0; $i < $tabKeysCount; $i++ ) {
+				$personal_urls[$tab_keys[$i]] = $tab_values[$i];
+			}
 		}
 		return true;
 	}
@@ -102,3 +104,4 @@ class UserBoardHooks {
 		}
 	}
 }
+
