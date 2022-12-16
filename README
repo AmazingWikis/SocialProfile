@@ -1,3 +1,7 @@
+NOTICE: This is now arachived. This is unsustainable for production usage. User Activity can be replicated using embeding of special pages. User Boards has been extraccted out for further development.
+
+
+
 This is the readme file for SocialProfile extension.
 
 This is considered SocialProfile Version 2. A lot of features have been gutted out for legal reasons or unused social components. The goal is to split User Activity and User Boards into independent extensions. Further enhancements is planned for the extraction of User Activity and User Boards from SocialProfile.
